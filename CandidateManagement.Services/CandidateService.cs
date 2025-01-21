@@ -1,6 +1,9 @@
 ﻿namespace CandidateManagement.Services;
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
@@ -37,6 +40,61 @@ public class CandidateService : ICandidateService
     public async Task<Candidate> RemoveCandidateAsync(int id)
     {
         return await _repository.DeleteCandidateAsync(id);
+    }
+
+    protected bool ValidateCandidate(Candidate candidate)
+    {
+        if (candidate == null) {
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(candidate.Forename)) {
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(candidate.Surname)) { 
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(candidate.Email)) {
+            return false;
+        }
+
+        try
+        {
+            var email = Regex.Replace(candidate.Email, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+            string DomainMapper(Match match)
+            {
+                // Use IdnMapping class to convert Unicode domain names.
+                var idn = new IdnMapping();
+
+                // Pull out and process domain name (throws ArgumentException on invalid)
+                string domainName = idn.GetAscii(match.Groups[2].Value);
+
+                return match.Groups[1].Value + domainName;
+            }
+        }
+        catch (RegexMatchTimeoutException e)
+        {
+            return false;
+        }
+        catch (ArgumentException e)
+        {
+            return false;
+        }
+
+
+
+        try
+        {
+            Regex.IsMatch(candidate.Email,
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return false;
+        }
+
+        return true;
+
     }
 }
 
