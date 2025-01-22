@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CandidateManagement.Exceptions;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
 
@@ -28,17 +29,20 @@ public class CandidateService : ICandidateService
     }
 
     public async Task<Candidate> CreateCandidateAsync(Candidate candidate)
-    {
+    {   
+        ValidateCandidate(candidate);
         return await _repository.AddCandidateAsync(candidate);
     }
 
     public async Task<Candidate> UpdateCandidateAsync(Candidate candidate)
     {
+        ValidateCandidate(candidate);
         return await _repository.UpdateCandidateAsync(candidate);
     }
 
     public async Task<Candidate> RemoveCandidateAsync(int id)
-    {
+    {   
+
         return await _repository.DeleteCandidateAsync(id);
     }
 
@@ -54,6 +58,9 @@ public class CandidateService : ICandidateService
             return false;
         }
         if (string.IsNullOrWhiteSpace(candidate.Email)) {
+            throw new BadRequestException("Email not provided, please provide valid email.");
+        }
+        if (string.IsNullOrWhiteSpace(candidate.DateOfBirth.ToString())) {
             return false;
         }
 
@@ -73,7 +80,7 @@ public class CandidateService : ICandidateService
         }
         catch (RegexMatchTimeoutException e)
         {
-            return false;
+            throw new Exception("Request timed out");
         }
         catch (ArgumentException e)
         {
@@ -90,7 +97,7 @@ public class CandidateService : ICandidateService
         }
         catch (RegexMatchTimeoutException)
         {
-            return false;
+            throw new Exception("Request timed out");
         }
 
         return true;
