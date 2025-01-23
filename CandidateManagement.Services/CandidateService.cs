@@ -23,9 +23,18 @@ public class CandidateService : ICandidateService
         return await _repository.GetCandidatesAsync();
     }
 
-    public async Task<Candidate?> GetCandidateByIdAsync(int id)
+    public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
     {
-        return await _repository.GetCandidateByIdAsync(id);
+        var test = await _repository.GetCandidateByIdAsync(id);
+
+        if (test == null) 
+        {
+            throw new RecordNotFoundException("Candidate not found");
+
+        }
+        return test;
+    
+
     }
 
     public async Task<Candidate> CreateCandidateAsync(Candidate candidate)
@@ -40,7 +49,7 @@ public class CandidateService : ICandidateService
         return await _repository.UpdateCandidateAsync(candidate);
     }
 
-    public async Task<Candidate> RemoveCandidateAsync(int id)
+    public async Task<Candidate> RemoveCandidateAsync(Guid id)
     {   
 
         return await _repository.DeleteCandidateAsync(id);

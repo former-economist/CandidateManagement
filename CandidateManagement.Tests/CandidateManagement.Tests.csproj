@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CandidateManagement.Exceptions\CandidateManagement.Exceptions.csproj" />
     <ProjectReference Include="..\CandidateManagement.Repositories\CandidateManagement.Repositories.csproj" />
+    <ProjectReference Include="..\CandidateManagement.Services\CandidateManagement.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
