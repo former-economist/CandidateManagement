@@ -63,9 +63,14 @@ namespace CandidateManagement.Tests
 
             //Action
             var service = new CandidateService(mockRepository.Object);
+
+            //Assert
             await Assert.ThrowsAsync<RecordNotFoundException> (() => service.GetCandidateByIdAsync(Guid.NewGuid()));
             
         }
+
+        //[Fact]
+        //public
 
         //// Example: Service Test in C#
         //[Fact]
@@ -105,8 +110,8 @@ namespace CandidateManagement.Tests
         //}
 
         private Candidate SampleCandidate()
-        {
-            return new Candidate
+        {   
+            Candidate candidate = new Candidate()
             {
                 Id = Guid.NewGuid(),
                 Forename = "Adam",
@@ -115,6 +120,7 @@ namespace CandidateManagement.Tests
                 DateOfBirth = DateTime.Now,
                 SwqrNumber = "10012345"
             };
+            return candidate;
         }
 
         private List<Candidate> SampleCandidates()

@@ -25,14 +25,14 @@ public class CandidateService : ICandidateService
 
     public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
     {
-        var test = await _repository.GetCandidateByIdAsync(id);
+        var candidate = await _repository.GetCandidateByIdAsync(id);
 
-        if (test == null) 
+        if (candidate == null) 
         {
             throw new RecordNotFoundException("Candidate not found");
 
         }
-        return test;
+        return candidate;
     
 
     }
@@ -58,13 +58,13 @@ public class CandidateService : ICandidateService
     protected bool ValidateCandidate(Candidate candidate)
     {
         if (candidate == null) {
-            return false;
+            throw new BadRequestException("Candidate instance is null");
         }
         if (string.IsNullOrWhiteSpace(candidate.Forename)) {
-            return false;
+            throw new BadRequestException("Forename is required");
         }
-        if (string.IsNullOrWhiteSpace(candidate.Surname)) { 
-            return false;
+        if (string.IsNullOrWhiteSpace(candidate.Surname)) {
+            throw new BadRequestException("Surname is required");
         }
         if (string.IsNullOrWhiteSpace(candidate.Email)) {
             throw new BadRequestException("Email not provided, please provide valid email.");
