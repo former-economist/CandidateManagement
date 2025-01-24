@@ -69,9 +69,90 @@ namespace CandidateManagement.Tests
             
         }
 
-        //[Fact]
-        //public
 
+
+        [Fact]
+        public async void CreateCandidateAsync_Creates_A_Candidate()
+        {   
+            //Arrange
+            var candidate = SampleCandidate();
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(candidate);
+
+            //Action
+            var service = new CandidateService(mockRepository.Object);
+            var outcome = await service.CreateCandidateAsync(candidate);
+
+            Assert.NotNull(outcome);
+            Assert.Equal(outcome.Id, candidate.Id);
+            Assert.Equal(outcome.SwqrNumber, candidate.SwqrNumber);
+        }
+
+        [Fact]
+        public async void CreateCandidateAsync_Throws_Exception_For_Null_FOr_Null_Candidate()
+        {
+            //Arrange
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
+
+            //Action
+            var service = new CandidateService(mockRepository.Object);
+            
+            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(null as Candidate));
+        }
+
+        [Fact]
+        public async void CreateCandidateAsync_Throws_Exception_For_No_Email()
+        {
+            var candidate = SampleCandidate();
+            candidate.Email = string.Empty;
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
+
+            var service = new CandidateService(mockRepository.Object);
+
+            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+        }
+
+        [Fact]
+        public async void CreateCandidateAsync_Throws_Exception_For_Invalid_Email()
+        {
+            var candidate = SampleCandidate();
+            candidate.Email = "exampletest";
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
+
+            var service = new CandidateService(mockRepository.Object);
+
+            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+        }
+
+        [Fact]
+        public async void CreateCandidateAsync_Throws_Exception_For_Underage_Candidate()
+        {
+            var candidate = SampleCandidate();
+            candidate.DateOfBirth = DateTime.UtcNow;
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
+
+            var service = new CandidateService(mockRepository.Object);
+
+            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+        }
+
+        [Fact]
+        public async void UpdateCandidate_Updates_Candidate_Details()
+        {
+            var candidate = SampleCandidate();
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
+        }
         //// Example: Service Test in C#
         //[Fact]
         //public async Task GetProductById_ReturnsCorrectProduct()
@@ -117,7 +198,7 @@ namespace CandidateManagement.Tests
                 Forename = "Adam",
                 Surname = "Smith",
                 Email = "adam.smith@example.com",
-                DateOfBirth = DateTime.Now,
+                DateOfBirth = DateTime.UtcNow.Date.AddYears(-18),
                 SwqrNumber = "10012345"
             };
             return candidate;

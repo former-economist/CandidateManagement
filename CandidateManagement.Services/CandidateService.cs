@@ -44,7 +44,8 @@ public class CandidateService : ICandidateService
     }
 
     public async Task<Candidate> UpdateCandidateAsync(Candidate candidate)
-    {
+    {   
+        candidate = await GetCandidateByIdAsync(candidate.Id);
         ValidateCandidate(candidate);
         return await _repository.UpdateCandidateAsync(candidate);
     }
@@ -55,62 +56,45 @@ public class CandidateService : ICandidateService
         return await _repository.DeleteCandidateAsync(id);
     }
 
-    protected bool ValidateCandidate(Candidate candidate)
+    private void ValidateCandidate(Candidate candidate)
     {
-        if (candidate == null) {
+        if (candidate == null)
+        {
             throw new BadRequestException("Candidate instance is null");
         }
-        if (string.IsNullOrWhiteSpace(candidate.Forename)) {
+        if (string.IsNullOrWhiteSpace(candidate.Forename))
+        {
             throw new BadRequestException("Forename is required");
         }
-        if (string.IsNullOrWhiteSpace(candidate.Surname)) {
+        if (string.IsNullOrWhiteSpace(candidate.Surname))
+        {
             throw new BadRequestException("Surname is required");
         }
-        if (string.IsNullOrWhiteSpace(candidate.Email)) {
+        if (string.IsNullOrWhiteSpace(candidate.Email))
+        {
             throw new BadRequestException("Email not provided, please provide valid email.");
         }
-        if (string.IsNullOrWhiteSpace(candidate.DateOfBirth.ToString())) {
-            return false;
-        }
-
-        try
+        if (string.IsNullOrWhiteSpace(candidate.DateOfBirth.ToString()))
         {
-            var email = Regex.Replace(candidate.Email, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
-            string DomainMapper(Match match)
-            {
-                // Use IdnMapping class to convert Unicode domain names.
-                var idn = new IdnMapping();
-
-                // Pull out and process domain name (throws ArgumentException on invalid)
-                string domainName = idn.GetAscii(match.Groups[2].Value);
-
-                return match.Groups[1].Value + domainName;
-            }
+            throw new BadRequestException("Date of birth not entered, provided date of birth.");
         }
-        catch (RegexMatchTimeoutException e)
+        if (!CandidateIs18OrOver(candidate))
         {
-            throw new Exception("Request timed out");
+            throw new BadRequestException("You are not old enough to use the service, candidate's must be 18 or over.");
         }
-        catch (ArgumentException e)
-        {
-            return false;
-        }
-
-
-
-        try
-        {
-            Regex.IsMatch(candidate.Email,
+        var emailValid = Regex.IsMatch(candidate.Email,
                 @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                 RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
-        }
-        catch (RegexMatchTimeoutException)
+        if (!emailValid)
         {
-            throw new Exception("Request timed out");
+            throw new BadRequestException("Email not provided, please provide valid email.");
         }
+    }
 
-        return true;
-
+    private bool CandidateIs18OrOver(Candidate candidate)
+    {
+        var minBirthDate = DateTime.UtcNow.Date.AddYears(-18);
+        return candidate.DateOfBirth.Date <= minBirthDate ? true : false;
     }
 }
 
