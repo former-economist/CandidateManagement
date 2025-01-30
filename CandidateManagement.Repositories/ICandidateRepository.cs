@@ -9,4 +9,5 @@ public interface ICandidateRepository
     Task<Candidate> AddCandidateAsync(Candidate candidate);
     Task<Candidate> UpdateCandidateAsync(Candidate candidate);
     Task<Candidate> DeleteCandidateAsync(Guid id);
+    Task<Candidate> GetCandidateByEmailAsync(string email);
 }

@@ -145,14 +145,72 @@ namespace CandidateManagement.Tests
             await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
         }
 
-        [Fact]
-        public async void UpdateCandidate_Updates_Candidate_Details()
+        public async void CreateCandidateAsync_Throws_Exception_For_Existing_Email()
         {
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.GetCandidateByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync(null as Candidate);
+
+            var service = new CandidateService(mockRepository.Object);
+
+            await Assert.ThrowsAsync<ExistingRecordException>(() => service.CreateCandidateAsync(candidate));
         }
+
+        [Fact]
+        public async void UpdateCandidate_Updates_Candidate_Details()
+        {
+
+            var candidateToBeUpdated = SampleCandidate();
+          
+            Candidate updatedCandidate = new Candidate()
+            {
+                Id = candidateToBeUpdated.Id,
+                Forename = "Troy",
+                Surname = "Mclure",
+                Email = "adam.smith@example.com",
+                DateOfBirth = DateTime.UtcNow.Date.AddYears(-18),
+                SwqrNumber = "10012345"
+            };
+
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(candidateToBeUpdated);
+            mockRepository.Setup(x => x.UpdateCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(updatedCandidate);
+
+            var service = new CandidateService(mockRepository.Object);
+            var actual = await service.UpdateCandidateAsync(candidateToBeUpdated);
+
+
+
+            Assert.NotNull(actual);
+            Assert.Equal(candidateToBeUpdated.Id, actual.Id);
+            Assert.NotEqual("Adam", actual.Forename);
+            Assert.NotEqual("Smith", actual.Surname);
+            Assert.Equal("Troy", actual.Forename);
+            Assert.Equal("Mclure", actual.Surname);
+        }
+
+        [Fact]
+        public async void RemoveCandidate_Removes_Candidate()
+        {
+            var candidateToBeDeleted = SampleCandidate();
+
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(candidateToBeDeleted);
+
+            var service = new CandidateService(mockRepository.Object);
+        }
+        //[Fact]
+        //public async void DeleteCandidate_Deletes_Candidate()
+        //{
+        //    var candidate = SampleCandidate();
+        //    var mockRepository = new Mock<ICandidateRepository>();
+        //    mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
+        //        .ReturnsAsync();
+        //}
         //// Example: Service Test in C#
         //[Fact]
         //public async Task GetProductById_ReturnsCorrectProduct()

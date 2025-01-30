@@ -47,8 +47,14 @@ public class CandidateRepository : ICandidateRepository
     {
         using var connection = new SqlConnection(_connectionString);
         const string query = "DELETE FROM Candidates OUTPUT DELETED.* WHERE Id = @Id";
-        return await connection.QuerySingleAsync<Candidate>(query, new { Id = id });
+        return await connection.QuerySingleOrDefaultAsync<Candidate>(query, new { Id = id });
     }
 
+    public async Task<Candidate?> GetCandidateByEmailAsync(string email)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        const string query = "SELECT * FROM CANDIDATES WHERE Email = @Email";
+        return await connection.QueryFirstOrDefaultAsync<Candidate>(query, new { Email = email });
+    }
 }
 

@@ -38,8 +38,14 @@ public class CandidateService : ICandidateService
     }
 
     public async Task<Candidate> CreateCandidateAsync(Candidate candidate)
-    {   
+    {
         ValidateCandidate(candidate);
+        var existingCandidate = await _repository.GetCandidateByEmailAsync(candidate.Email);
+        if (existingCandidate != null)
+        {
+            throw new ExistingRecordException("A candidate account already exist using given email");
+        }
+        
         return await _repository.AddCandidateAsync(candidate);
     }
 
@@ -51,7 +57,13 @@ public class CandidateService : ICandidateService
     }
 
     public async Task<Candidate> RemoveCandidateAsync(Guid id)
-    {   
+    {
+        var candidate = await GetCandidateByIdAsync(id);
+        if (candidate == null)
+        {
+            throw new RecordNotFoundException("Candidate not found");
+
+        }
 
         return await _repository.DeleteCandidateAsync(id);
     }
