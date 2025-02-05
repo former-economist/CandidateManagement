@@ -22,7 +22,7 @@ public class CandidateRepository : ICandidateRepository
         return await connection.QuerySingleAsync<Candidate>(query, candidate);
     }
 
-    public async Task<Candidate> GetCandidateByIdAsync(int id)
+    public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
     {
         using var connection = new SqlConnection(_connectionString);
         const string query = "SELECT * FROM Candidates WHERE Id = @Id";
@@ -43,12 +43,18 @@ public class CandidateRepository : ICandidateRepository
         return await connection.QuerySingleAsync<Candidate>(query, candidate);
     }
 
-    public async Task<Candidate> DeleteCandidateAsync(int id)
+    public async Task<Candidate> DeleteCandidateAsync(Guid id)
     {
         using var connection = new SqlConnection(_connectionString);
         const string query = "DELETE FROM Candidates OUTPUT DELETED.* WHERE Id = @Id";
-        return await connection.QuerySingleAsync<Candidate>(query, new { Id = id });
+        return await connection.QuerySingleOrDefaultAsync<Candidate>(query, new { Id = id });
     }
 
+    public async Task<Candidate?> GetCandidateByEmailAsync(string email)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        const string query = "SELECT * FROM CANDIDATES WHERE Email = @Email";
+        return await connection.QueryFirstOrDefaultAsync<Candidate>(query, new { Email = email });
+    }
 }
 
