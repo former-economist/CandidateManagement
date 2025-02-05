@@ -202,51 +202,13 @@ namespace CandidateManagement.Tests
                 .ReturnsAsync(candidateToBeDeleted);
 
             var service = new CandidateService(mockRepository.Object);
+            
+            var actualOutput = await service.RemoveCandidateAsync(candidateToBeDeleted.Id);
+
+            Assert.NotNull(actualOutput);
+            Assert.Equal(actualOutput.Id, candidateToBeDeleted.Id);
+
         }
-        //[Fact]
-        //public async void DeleteCandidate_Deletes_Candidate()
-        //{
-        //    var candidate = SampleCandidate();
-        //    var mockRepository = new Mock<ICandidateRepository>();
-        //    mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
-        //        .ReturnsAsync();
-        //}
-        //// Example: Service Test in C#
-        //[Fact]
-        //public async Task GetProductById_ReturnsCorrectProduct()
-        //{
-        //    // Arrange
-        //    var mockRepo = new Mock<IProductRepository>();
-        //    mockRepo.Setup(repo => repo.GetByIdAsync(1))
-        //            .ReturnsAsync(new Product { Id = 1, Name = "TestProduct" });
-
-        //    var service = new ProductService(mockRepo.Object);
-
-        //    // Act
-        //    var product = await service.GetProductByIdAsync(1);
-
-        //    // Assert
-        //    Assert.NotNull(product);
-        //    Assert.Equal("TestProduct", product.Name);
-        //}
-
-        //[Fact]
-        //public async Task GetProductById_ReturnsProductFromDatabase()
-        //{
-        //    // Arrange
-        //    using var context = new InMemoryDbContext();
-        //    context.Products.Add(new Product { Id = 1, Name = "TestProduct" });
-        //    await context.SaveChangesAsync();
-
-        //    var repository = new ProductRepository(context);
-
-        //    // Act
-        //    var product = await repository.GetByIdAsync(1);
-
-        //    // Assert
-        //    Assert.NotNull(product);
-        //    Assert.Equal("TestProduct", product.Name);
-        //}
 
         private Candidate SampleCandidate()
         {   

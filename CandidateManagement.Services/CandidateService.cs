@@ -58,14 +58,15 @@ public class CandidateService : ICandidateService
 
     public async Task<Candidate> RemoveCandidateAsync(Guid id)
     {
-        var candidate = await GetCandidateByIdAsync(id);
-        if (candidate == null)
-        {
-            throw new RecordNotFoundException("Candidate not found");
+        var deletedCandidate = await _repository.DeleteCandidateAsync(id);
+        var isCandidateStillExist = await CheckIfCandidateExistsById(id);
 
+        if (isCandidateStillExist != null)
+        {
+            throw new RecordNotDeletedException("Record not deleted");
         }
 
-        return await _repository.DeleteCandidateAsync(id);
+        return deletedCandidate;
     }
 
     private void ValidateCandidate(Candidate candidate)
@@ -107,6 +108,11 @@ public class CandidateService : ICandidateService
     {
         var minBirthDate = DateTime.UtcNow.Date.AddYears(-18);
         return candidate.DateOfBirth.Date <= minBirthDate ? true : false;
+    }
+
+    private async Task<Candidate?> CheckIfCandidateExistsById(Guid id)
+    {
+        return await _repository.GetCandidateByIdAsync(id); 
     }
 }
 

@@ -16,6 +16,7 @@ namespace CandidateManagement.Models
         [StringLength(50, ErrorMessage = "Candidate Surname cannot be longer than 50 characters")]
         public string Surname { get; set; } = "";
 
+        [Required(ErrorMessage = "Email required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; } = "";
 
