@@ -210,6 +210,19 @@ namespace CandidateManagement.Tests
 
         }
 
+        [Fact]
+        public async void RemoveCandidate_Raises_Exception_Non_Existent_Candidate()
+        {
+            var candidate = SampleCandidate();
+            var mockRepository = new Mock<ICandidateRepository>();
+            mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(null as Candidate);
+
+            var service = new CandidateService(mockRepository.Object);
+
+            await Assert.ThrowsAsync<RecordNotFoundException>(() => service.RemoveCandidateAsync(candidate.Id));
+        }
+
         private Candidate SampleCandidate()
         {   
             Candidate candidate = new Candidate()

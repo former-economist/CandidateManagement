@@ -59,6 +59,10 @@ public class CandidateService : ICandidateService
     public async Task<Candidate> RemoveCandidateAsync(Guid id)
     {
         var deletedCandidate = await _repository.DeleteCandidateAsync(id);
+        if(deletedCandidate == null)
+        {
+            throw new RecordNotFoundException("Record not found, cannot be deleted");
+        }
         var isCandidateStillExist = await CheckIfCandidateExistsById(id);
 
         if (isCandidateStillExist != null)
