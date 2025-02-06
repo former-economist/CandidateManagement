@@ -51,7 +51,12 @@ public class CandidateService : ICandidateService
 
     public async Task<Candidate> UpdateCandidateAsync(Candidate candidate)
     {   
-        candidate = await GetCandidateByIdAsync(candidate.Id);
+        var isCandidateExist = await CheckIfCandidateExistsById(candidate.Id);
+        if (isCandidateExist == null)
+        {
+            throw new RecordNotFoundException("Candidate not found");
+
+        }
         ValidateCandidate(candidate);
         return await _repository.UpdateCandidateAsync(candidate);
     }
