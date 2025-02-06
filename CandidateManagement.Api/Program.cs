@@ -13,7 +13,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped<ICandidateRepository>(provider => new CandidateRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ICandidateService, CandidateService>();
-
+builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 
 
 var app = builder.Build();
@@ -26,7 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStatusCodePages();
-//app.UseExceptionHandler();
+app.UseExceptionHandler();
 
 // Map endpoints 
 

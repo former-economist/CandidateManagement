@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CandidateManagement.Handlers\CandidateManagement.Handlers.csproj" />
     <ProjectReference Include="..\CandidateManagement.Services\CandidateManagement.Services.csproj" />
   </ItemGroup>
 
