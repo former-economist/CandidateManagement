@@ -1,3 +1,4 @@
+using CandidateManagement.Exceptions;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
 using CandidateManagement.Services;
@@ -32,7 +33,16 @@ app.UseExceptionHandler();
 
 app.MapGet("/candidates", async (ICandidateService service) => await service.GetAllCandidatesAsync());
 
-app.MapGet("/candidates/{id}", async (Guid id, ICandidateService service) => await service.GetCandidateByIdAsync(id));
+app.MapGet("/candidates/{id}", async (Guid id, ICandidateService service) => {
+    return Results.Ok(await service.GetCandidateByIdAsync(id));
+    //try
+    //{
+    //    return Results.Ok(await service.GetCandidateByIdAsync(id));
+    //}
+    //catch (RecordNotFoundException ex) {
+    //    return Results.NotFound("Candidate not found");
+    //}
+});
 
 app.MapPost("/candidates", async (Candidate candidate, ICandidateService service) => await service.CreateCandidateAsync(candidate));
 

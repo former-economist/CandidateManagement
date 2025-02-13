@@ -8,18 +8,22 @@ using System.Threading.Tasks;
 using CandidateManagement.Exceptions;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
+using Microsoft.Extensions.Logging;
 
 public class CandidateService : ICandidateService
 {
     private readonly ICandidateRepository _repository;
+    private readonly ILogger _logger;
 
-    public CandidateService(ICandidateRepository repository)
+    public CandidateService(ICandidateRepository repository, ILogger<CandidateService> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
+        _logger.LogInformation("Accessing all candidates");
         return await _repository.GetCandidatesAsync();
     }
 
@@ -29,9 +33,9 @@ public class CandidateService : ICandidateService
 
         if (candidate == null) 
         {
-            throw new RecordNotFoundException("Candidate not found");
-
+            _logger.LogError(new RecordNotFoundException("Candidate not found").ToString());
         }
+        _logger.LogInformation("Candidate Exists");
         return candidate;
     
 

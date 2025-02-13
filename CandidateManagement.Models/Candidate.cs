@@ -8,15 +8,15 @@ namespace CandidateManagement.Models
         [Key]
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "Forename required")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Forename required")]
         [StringLength(50, ErrorMessage = "Candidate Forename cannot be longer than 50 characters")]
         public string Forename { get; set; } = "";
 
-        [Required(ErrorMessage = "Surname required")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Surname required")]
         [StringLength(50, ErrorMessage = "Candidate Surname cannot be longer than 50 characters")]
         public string Surname { get; set; } = "";
 
-        [Required(ErrorMessage = "Email required")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Email required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; } = "";
 
