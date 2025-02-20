@@ -4,7 +4,9 @@ using CandidateManagement.Repositories;
 using CandidateManagement.Services;
 using CandidateManagement.Exceptions;
 
-using Moq; 
+using Moq;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace CandidateManagement.Tests
 {
@@ -15,10 +17,11 @@ namespace CandidateManagement.Tests
         {   
             var candidates = SampleCandidates();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidatesAsync().Result)
                 .Returns(candidates);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
 
             var results = await service.GetAllCandidatesAsync();
             var resultList = results.ToList();
@@ -40,16 +43,17 @@ namespace CandidateManagement.Tests
             //Arrange
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var result = await service.GetCandidateByIdAsync(candidate.Id);
 
 
             Assert.NotNull(result);
-            Assert.Equal(result.Id, candidate.Id);
+            Assert.Equal(result.Value.Id, candidate.Id);
         }
 
         [Fact]
@@ -57,16 +61,22 @@ namespace CandidateManagement.Tests
         {
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(null as Candidate);
 
 
             //Action
-            var service = new CandidateService(mockRepository.Object);
-
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var guid = Guid.NewGuid();
+            var outcome = service.GetCandidateByIdAsync(guid);
             //Assert
-            await Assert.ThrowsAsync<RecordNotFoundException> (() => service.GetCandidateByIdAsync(Guid.NewGuid()));
-            
+            Assert.NotEqual(outcome.Result, null);
+            Assert.NotEqual(outcome.Result.ProblemDetails, null);
+            Assert.Equal(outcome.Result.ProblemDetails.Detail, $"Candidate with ID {guid} not found");
+            Assert.Equal(outcome.Result.ProblemDetails.Status, 404);
+            Assert.Null(outcome.Result.Value);
+
         }
 
 
@@ -77,84 +87,119 @@ namespace CandidateManagement.Tests
             //Arrange
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = await service.CreateCandidateAsync(candidate);
 
             Assert.NotNull(outcome);
-            Assert.Equal(outcome.Id, candidate.Id);
-            Assert.Equal(outcome.SwqrNumber, candidate.SwqrNumber);
+            Assert.Equal(outcome.IsSuccess, true);
+            Assert.Equal(outcome.Value.Id, candidate.Id);
+            Assert.Equal(outcome.Value.SwqrNumber, candidate.SwqrNumber);
         }
 
         [Fact]
-        public async void CreateCandidateAsync_Throws_Exception_For_Null_FOr_Null_Candidate()
+        public async void CreateCandidateAsync_Returns_400_For_Null_FOr_Null_Candidate()
         {
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object);
-            
-            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(null as Candidate));
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = service.CreateCandidateAsync(null as Candidate);
+
+            Assert.Equal(outcome.Result.IsSuccess, false);
+            Assert.NotEqual(outcome.Result.ProblemDetails, null);
+            Assert.Equal(outcome.Result.ProblemDetails.Detail, "Null Candidate object provided");
+            Assert.Equal(outcome.Result.ProblemDetails.Status, 400);
+            Assert.Null(outcome.Result.Value);
         }
 
         [Fact]
-        public async void CreateCandidateAsync_Throws_Exception_For_No_Email()
+        public async void CreateCandidateAsync_Returns_400_For_No_Email()
         {
             var candidate = SampleCandidate();
             candidate.Email = string.Empty;
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = service.CreateCandidateAsync(candidate);
 
-            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+            Assert.Equal(outcome.Result.IsSuccess, false);
+            Assert.NotEqual(outcome.Result.ProblemDetails, null);
+            Assert.Equal(outcome.Result.ProblemDetails.Detail, "Candidate Email not provided");
+            Assert.Equal(outcome.Result.ProblemDetails.Status, 400);
+            Assert.Null(outcome.Result.Value);
         }
 
         [Fact]
-        public async void CreateCandidateAsync_Throws_Exception_For_Invalid_Email()
+        public async void CreateCandidateAsync_Returns_400_For_Invalid_Email()
         {
             var candidate = SampleCandidate();
             candidate.Email = "exampletest";
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
 
-            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+            var outcome = service.CreateCandidateAsync(candidate);
+
+            Assert.Equal(outcome.Result.IsSuccess, false);
+            Assert.NotEqual(outcome.Result.ProblemDetails, null);
+            Assert.Equal(outcome.Result.ProblemDetails.Detail, "Invalid Candidate email provided");
+            Assert.Equal(outcome.Result.ProblemDetails.Status, 400);
+            Assert.Null(outcome.Result.Value);
         }
 
         [Fact]
-        public async void CreateCandidateAsync_Throws_Exception_For_Underage_Candidate()
+        public async void CreateCandidateAsync_Returns_403_For_Underage_Candidate()
         {
             var candidate = SampleCandidate();
             candidate.DateOfBirth = DateTime.UtcNow;
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = service.CreateCandidateAsync(candidate);
 
-            await Assert.ThrowsAsync<BadRequestException>(() => service.CreateCandidateAsync(candidate));
+            Assert.Equal(outcome.Result.IsSuccess, false);
+            Assert.NotEqual(outcome.Result.ProblemDetails, null);
+            Assert.Equal(outcome.Result.ProblemDetails.Detail, "Users must be a minimum of 18 years old");
+            Assert.Equal(outcome.Result.ProblemDetails.Status, 403);
+            Assert.Null(outcome.Result.Value);
         }
 
-        public async void CreateCandidateAsync_Throws_Exception_For_Existing_Email()
+        [Fact]
+        public async void CreateCandidateAsync_Returns_403_For_Existing_Email()
         {
             var candidate = SampleCandidate();
+            var existingCandidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(null as Candidate);
+                .ReturnsAsync(existingCandidate);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = service.CreateCandidateAsync(candidate);
 
-            await Assert.ThrowsAsync<ExistingRecordException>(() => service.CreateCandidateAsync(candidate));
+            Assert.Null(outcome.Result.Value);
+            Assert.Equal(false, outcome.Result.IsSuccess);
+            Assert.NotEqual(null, outcome.Result.ProblemDetails);
+            Assert.Equal("Canidate already exist with given email", outcome.Result.ProblemDetails.Detail);
+            Assert.Equal(403, outcome.Result.ProblemDetails.Status);
         }
 
         [Fact]
@@ -174,22 +219,23 @@ namespace CandidateManagement.Tests
             };
 
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeUpdated);
             mockRepository.Setup(x => x.UpdateCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(updatedCandidate);
 
-            var service = new CandidateService(mockRepository.Object);
-            var actual = await service.UpdateCandidateAsync(candidateToBeUpdated);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = await service.UpdateCandidateAsync(candidateToBeUpdated);
 
 
-
-            Assert.NotNull(actual);
-            Assert.Equal(candidateToBeUpdated.Id, actual.Id);
-            Assert.NotEqual("Adam", actual.Forename);
-            Assert.NotEqual("Smith", actual.Surname);
-            Assert.Equal("Troy", actual.Forename);
-            Assert.Equal("Mclure", actual.Surname);
+            Assert.Equal(true, outcome.IsSuccess);
+            Assert.NotNull(outcome);
+            Assert.Equal(candidateToBeUpdated.Id, outcome.Value.Id);
+            Assert.NotEqual("Adam", outcome.Value.Forename);
+            Assert.NotEqual("Smith", outcome.Value.Surname);
+            Assert.Equal("Troy", outcome.Value.Forename);
+            Assert.Equal("Mclure", outcome.Value.Surname);
         }
 
         [Fact]
@@ -198,16 +244,16 @@ namespace CandidateManagement.Tests
             var candidateToBeDeleted = SampleCandidate();
 
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeDeleted);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             
             var actualOutput = await service.RemoveCandidateAsync(candidateToBeDeleted.Id);
 
             Assert.NotNull(actualOutput);
-            Assert.Equal(actualOutput.Id, candidateToBeDeleted.Id);
-
+            Assert.Equal(actualOutput.Value.Id, candidateToBeDeleted.Id);
         }
 
         [Fact]
@@ -215,12 +261,18 @@ namespace CandidateManagement.Tests
         {
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object);
+            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var outcome = service.RemoveCandidateAsync(candidate.Id);
 
-            await Assert.ThrowsAsync<RecordNotFoundException>(() => service.RemoveCandidateAsync(candidate.Id));
+            Assert.Null(outcome.Result.Value);
+            Assert.Equal(false, outcome.Result.IsSuccess);
+            Assert.NotEqual(null, outcome.Result.ProblemDetails);
+            Assert.Equal($"Candidate with ID {candidate.Id} not found, cannot be deleted", outcome.Result.ProblemDetails.Detail);
+            Assert.Equal(404, outcome.Result.ProblemDetails.Status);
         }
 
         private Candidate SampleCandidate()
