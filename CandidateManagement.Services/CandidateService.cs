@@ -8,104 +8,236 @@ using System.Threading.Tasks;
 using CandidateManagement.Exceptions;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 public class CandidateService : ICandidateService
 {
     private readonly ICandidateRepository _repository;
+    private readonly ILogger _logger;
 
-    public CandidateService(ICandidateRepository repository)
+    public CandidateService(ICandidateRepository repository, ILogger<CandidateService> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
+        _logger.LogInformation("Accessing all candidates");
         return await _repository.GetCandidatesAsync();
     }
 
-    public async Task<Candidate?> GetCandidateByIdAsync(Guid id)
+    public async Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id)
     {
         var candidate = await _repository.GetCandidateByIdAsync(id);
 
         if (candidate == null) 
         {
-            throw new RecordNotFoundException("Candidate not found");
-
+            _logger.LogError($"Candidate with ID {id} not found");
+            var problemDetails = new ProblemDetails
+            { 
+                Title = "Candidate not found",
+                Detail = $"Candidate with ID {id} not found",
+                Status = 404
+            };
+            return Result<Candidate>.Failure(problemDetails);
         }
-        return candidate;
+        _logger.LogInformation("Candidate Exists");
+        return Result<Candidate>.Success(candidate)!;
     
 
     }
 
-    public async Task<Candidate> CreateCandidateAsync(Candidate candidate)
+    public async Task<Result<Candidate>> CreateCandidateAsync(Candidate candidate)
     {
-        ValidateCandidate(candidate);
+        var isValidCandidate = ValidateCandidate(candidate);
+
+        if (!isValidCandidate.IsSuccess) {
+            _logger.LogError($"{isValidCandidate.ProblemDetails.Detail}");
+            return isValidCandidate;
+        }
+        
         var existingCandidate = await _repository.GetCandidateByEmailAsync(candidate.Email);
         if (existingCandidate != null)
         {
-            throw new ExistingRecordException("A candidate account already exist using given email");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Duplicate Candidate",
+                Detail = $"Canidate already exist with given email {candidate.Email}",
+                Status = 403
+            };
+
+            _logger.LogError($"Canidate already exist with given email {candidate.Email}");
+
+            return Result<Candidate>.Failure(problemDetails)!;
         }
-        
-        return await _repository.AddCandidateAsync(candidate);
+
+        var addedCandidate = await _repository.AddCandidateAsync(candidate);
+
+        _logger.LogInformation($"Added {addedCandidate.Id}");
+
+        return Result<Candidate>.Success(candidate);
     }
 
-    public async Task<Candidate> UpdateCandidateAsync(Candidate candidate)
+    public async Task<Result<Candidate>> UpdateCandidateAsync(Candidate candidate)
     {   
-        candidate = await GetCandidateByIdAsync(candidate.Id);
+        var isCandidateExist = await CheckIfCandidateExistsById(candidate.Id);
+        if (isCandidateExist == null)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Candidate not found",
+                Detail = $"Candidate with ID {candidate.Id} not found",
+                Status = 404
+            };
+
+            _logger.LogError($"Candidate with ID {candidate.Id} not found");
+            return Result<Candidate>.Failure(problemDetails);
+
+        }
         ValidateCandidate(candidate);
-        return await _repository.UpdateCandidateAsync(candidate);
+        
+        var updatedCandidate = await _repository.UpdateCandidateAsync(candidate);
+
+        _logger.LogInformation($"Candidate with ID {candidate.Id} update");
+        return Result<Candidate>.Success(updatedCandidate);
     }
 
-    public async Task<Candidate> RemoveCandidateAsync(Guid id)
+    public async Task<Result<Candidate>> RemoveCandidateAsync(Guid id)
     {
         var deletedCandidate = await _repository.DeleteCandidateAsync(id);
         if(deletedCandidate == null)
         {
-            throw new RecordNotFoundException("Record not found, cannot be deleted");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Candidate not found",
+                Detail = $"Candidate with ID {id} not found, cannot be deleted",
+                Status = 404
+            };
+
+            _logger.LogError($"Unable to remove candidate: {id}");
+            return Result<Candidate>.Failure(problemDetails);
+            
         }
         var isCandidateStillExist = await CheckIfCandidateExistsById(id);
 
         if (isCandidateStillExist != null)
         {
-            throw new RecordNotDeletedException("Record not deleted");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Action not completed",
+                Detail = "Record not deleted",
+                Status = 500
+            };
+
+            _logger.LogError($"Record not deleted after attempt to delete");
+            return Result<Candidate>.Failure(problemDetails);
+            
         }
 
-        return deletedCandidate;
+        _logger.LogInformation($"Candidate with ID {id} removed");
+        return Result<Candidate>.Success(deletedCandidate);
     }
 
-    private void ValidateCandidate(Candidate candidate)
+    private Result<Candidate> ValidateCandidate(Candidate candidate)
     {
         if (candidate == null)
         {
-            throw new BadRequestException("Candidate instance is null");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "No input data provided",
+                Detail = "Null Candidate object provided",
+                Status = 400
+            };
+
+            _logger.LogError("Null candidate object");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Forename))
         {
-            throw new BadRequestException("Forename is required");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Insufficient candidate data provided",
+                Detail = "Candidate Forename not provided",
+                Status = 400
+            };
+
+            _logger.LogError("Candidate forename not provided");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Surname))
         {
-            throw new BadRequestException("Surname is required");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Insufficient candidate data provided",
+                Detail = "Candidate Surname not provided",
+                Status = 400
+            };
+
+            _logger.LogError("Candidate surname not provided");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Email))
         {
-            throw new BadRequestException("Email not provided, please provide valid email.");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Insufficient candidate data provided",
+                Detail = "Candidate Email not provided",
+                Status = 400
+            };
+
+            _logger.LogError("Candidate email not provided");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.DateOfBirth.ToString()))
         {
-            throw new BadRequestException("Date of birth not entered, provided date of birth.");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Insufficient candidate data provided",
+                Detail = "Candidate Date of Birth not provided",
+                Status = 400
+            };
+
+            _logger.LogError("Candidate date of birth not provided");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (!CandidateIs18OrOver(candidate))
         {
-            throw new BadRequestException("You are not old enough to use the service, candidate's must be 18 or over.");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Forbidden: Age restriction",
+                Detail = "Users must be a minimum of 18 years old",
+                Status = 403
+            };
+
+            _logger.LogError("Candidate does not meet age restriction");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
         var emailValid = Regex.IsMatch(candidate.Email,
                 @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                 RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
         if (!emailValid)
         {
-            throw new BadRequestException("Email not provided, please provide valid email.");
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Insufficient candidate data provided",
+                Detail = "Invalid Candidate email provided",
+                Status = 400
+            };
+
+            _logger.LogError("Candidate email is invalid format");
+
+            return Result<Candidate>.Failure(problemDetails);
         }
+
+        return Result<Candidate>.Success(candidate);
     }
 
     private bool CandidateIs18OrOver(Candidate candidate)
