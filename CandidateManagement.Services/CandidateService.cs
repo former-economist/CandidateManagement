@@ -75,7 +75,7 @@ public class CandidateService : ICandidateService
 
         var addedCandidate = await _repository.AddCandidateAsync(candidate);
 
-        _logger.LogError($"Added {addedCandidate.Id}");
+        _logger.LogInformation($"Added {addedCandidate.Id}");
 
         return Result<Candidate>.Success(candidate);
     }
@@ -92,6 +92,7 @@ public class CandidateService : ICandidateService
                 Status = 404
             };
 
+            _logger.LogError($"Candidate with ID {candidate.Id} not found");
             return Result<Candidate>.Failure(problemDetails);
 
         }
@@ -99,6 +100,7 @@ public class CandidateService : ICandidateService
         
         var updatedCandidate = await _repository.UpdateCandidateAsync(candidate);
 
+        _logger.LogInformation($"Candidate with ID {candidate.Id} update");
         return Result<Candidate>.Success(updatedCandidate);
     }
 
@@ -113,6 +115,8 @@ public class CandidateService : ICandidateService
                 Detail = $"Candidate with ID {id} not found, cannot be deleted",
                 Status = 404
             };
+
+            _logger.LogError($"Unable to remove candidate: {id}");
             return Result<Candidate>.Failure(problemDetails);
             
         }
@@ -126,10 +130,13 @@ public class CandidateService : ICandidateService
                 Detail = "Record not deleted",
                 Status = 500
             };
+
+            _logger.LogError($"Record not deleted after attempt to delete");
             return Result<Candidate>.Failure(problemDetails);
             
         }
 
+        _logger.LogInformation($"Candidate with ID {id} removed");
         return Result<Candidate>.Success(deletedCandidate);
     }
 
@@ -144,6 +151,8 @@ public class CandidateService : ICandidateService
                 Status = 400
             };
 
+            _logger.LogError("Null candidate object");
+
             return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Forename))
@@ -154,6 +163,8 @@ public class CandidateService : ICandidateService
                 Detail = "Candidate Forename not provided",
                 Status = 400
             };
+
+            _logger.LogError("Candidate forename not provided");
 
             return Result<Candidate>.Failure(problemDetails);
         }
@@ -166,6 +177,8 @@ public class CandidateService : ICandidateService
                 Status = 400
             };
 
+            _logger.LogError("Candidate surname not provided");
+
             return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Email))
@@ -176,6 +189,8 @@ public class CandidateService : ICandidateService
                 Detail = "Candidate Email not provided",
                 Status = 400
             };
+
+            _logger.LogError("Candidate email not provided");
 
             return Result<Candidate>.Failure(problemDetails);
         }
@@ -188,6 +203,8 @@ public class CandidateService : ICandidateService
                 Status = 400
             };
 
+            _logger.LogError("Candidate date of birth not provided");
+
             return Result<Candidate>.Failure(problemDetails);
         }
         if (!CandidateIs18OrOver(candidate))
@@ -198,6 +215,8 @@ public class CandidateService : ICandidateService
                 Detail = "Users must be a minimum of 18 years old",
                 Status = 403
             };
+
+            _logger.LogError("Candidate does not meet age restriction");
 
             return Result<Candidate>.Failure(problemDetails);
         }
@@ -212,6 +231,8 @@ public class CandidateService : ICandidateService
                 Detail = "Invalid Candidate email provided",
                 Status = 400
             };
+
+            _logger.LogError("Candidate email is invalid format");
 
             return Result<Candidate>.Failure(problemDetails);
         }
