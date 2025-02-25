@@ -47,9 +47,9 @@ app.MapGet("/candidates/{id}", async (Guid id, ICandidateService service) => {
     //}
 });
 
-app.MapPost("/candidates", async (Candidate candidate, ICandidateService service) => await service.CreateCandidateAsync(candidate));
+app.MapPost("/candidates", async (CandidateManagement.Models.Object candidate, ICandidateService service) => await service.CreateCandidateAsync(candidate));
 
-app.MapPut("/candidates", async (Candidate candidate, ICandidateService service) => await service.UpdateCandidateAsync(candidate));
+app.MapPut("/candidates", async (CandidateManagement.Models.Object candidate, ICandidateService service) => await service.UpdateCandidateAsync(candidate));
 
 app.MapDelete("/candidates/{id}", async (Guid id, ICandidateService service) => await service.RemoveCandidateAsync(id));
 
