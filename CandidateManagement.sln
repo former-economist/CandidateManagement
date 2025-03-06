@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateManagement.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateManagement.Handlers", "CandidateManagement.Handlers\CandidateManagement.Handlers.csproj", "{D4A7CF21-B04C-44BC-9D6E-27237BB000DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateManagement.Infrastructure", "CandidateManagement.Infrastructure\CandidateManagement.Infrastructure.csproj", "{F84D3646-3DD2-4763-923F-C061A18414ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{D4A7CF21-B04C-44BC-9D6E-27237BB000DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4A7CF21-B04C-44BC-9D6E-27237BB000DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4A7CF21-B04C-44BC-9D6E-27237BB000DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84D3646-3DD2-4763-923F-C061A18414ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84D3646-3DD2-4763-923F-C061A18414ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84D3646-3DD2-4763-923F-C061A18414ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84D3646-3DD2-4763-923F-C061A18414ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,12 +9,18 @@
   <ItemGroup>
     <PackageReference Include="log4net" Version="3.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CandidateManagement.Handlers\CandidateManagement.Handlers.csproj" />
+    <ProjectReference Include="..\CandidateManagement.Infrastructure\CandidateManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\CandidateManagement.Services\CandidateManagement.Services.csproj" />
   </ItemGroup>
 

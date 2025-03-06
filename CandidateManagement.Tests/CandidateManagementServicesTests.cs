@@ -63,7 +63,7 @@ namespace CandidateManagement.Tests
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync<ICandidateRepository, Models.Object>(null as Models.Object);
+                .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
 
 
             //Action
@@ -88,7 +88,7 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Object>()))
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(candidate);
 
             //Action
@@ -107,12 +107,12 @@ namespace CandidateManagement.Tests
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Object>()))
-                .ReturnsAsync(null as Object);
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
 
             //Action
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
-            var outcome = service.CreateCandidateAsync(null as Models.Object);
+            var outcome = service.CreateCandidateAsync(null as Candidate);
 
             Assert.Equal(outcome.Result.IsSuccess, false);
             Assert.NotEqual(outcome.Result.ProblemDetails, null);
@@ -128,8 +128,8 @@ namespace CandidateManagement.Tests
             candidate.Email = string.Empty;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Object>()))
-                .ReturnsAsync(null as Object);
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
@@ -148,8 +148,8 @@ namespace CandidateManagement.Tests
             candidate.Email = "exampletest";
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Object>()))
-                .ReturnsAsync(null as Object);
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
 
@@ -169,8 +169,8 @@ namespace CandidateManagement.Tests
             candidate.DateOfBirth = DateTime.UtcNow;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Object>()))
-                .ReturnsAsync(null as Object);
+            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
@@ -198,8 +198,8 @@ namespace CandidateManagement.Tests
             Assert.Null(outcome.Result.Value);
             Assert.Equal(false, outcome.Result.IsSuccess);
             Assert.NotEqual(null, outcome.Result.ProblemDetails);
-            Assert.Equal("Canidate already exist with given email", outcome.Result.ProblemDetails.Detail);
-            Assert.Equal(403, outcome.Result.ProblemDetails.Status);
+            Assert.Equal("Canidate already exist with given email adam.smith@example.com", outcome.Result.ProblemDetails.Detail);
+            Assert.Equal(400, outcome.Result.ProblemDetails.Status);
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace CandidateManagement.Tests
 
             var candidateToBeUpdated = SampleCandidate();
 
-            Models.Object updatedCandidate = new Models.Object()
+            Candidate updatedCandidate = new Candidate()
             {
                 Id = candidateToBeUpdated.Id,
                 Forename = "Troy",
@@ -222,7 +222,7 @@ namespace CandidateManagement.Tests
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeUpdated);
-            mockRepository.Setup(x => x.UpdateCandidateAsync(It.IsAny<Object>()))
+            mockRepository.Setup(x => x.UpdateCandidateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(updatedCandidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -263,7 +263,7 @@ namespace CandidateManagement.Tests
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
-                .ReturnsAsync<ICandidateRepository, Models.Object>(null as Models.Object);
+                .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = service.RemoveCandidateAsync(candidate.Id);
@@ -275,9 +275,9 @@ namespace CandidateManagement.Tests
             Assert.Equal(404, outcome.Result.ProblemDetails.Status);
         }
 
-        private Models.Object SampleCandidate()
+        private Candidate SampleCandidate()
         {
-            Models.Object candidate = new Models.Object()
+            var candidate = new Candidate()
             {
                 Id = Guid.NewGuid(),
                 Forename = "Adam",
@@ -289,11 +289,11 @@ namespace CandidateManagement.Tests
             return candidate;
         }
 
-        private List<Models.Object> SampleCandidates()
+        private List<Candidate> SampleCandidates()
         {
-            List<Models.Object> candidates = new List<Models.Object>
+            List<Candidate> candidates = new List<Candidate>
             {
-                new Models.Object
+                new Candidate
                 {
                     Forename = "Adam",
                     Surname = "Smith",
@@ -301,7 +301,7 @@ namespace CandidateManagement.Tests
                     DateOfBirth = DateTime.Now,
                     SwqrNumber = "10012345"
                 },
-                new Models.Object
+                new Candidate
                 {
                     Forename = "Alec",
                     Surname = "Smith",
@@ -309,7 +309,7 @@ namespace CandidateManagement.Tests
                     DateOfBirth = DateTime.Now,
                     SwqrNumber = "10012344"
                 },
-                new Models.Object
+                new Candidate
                 {
                     Forename = "Barbara",
                     Surname = "Smith",
