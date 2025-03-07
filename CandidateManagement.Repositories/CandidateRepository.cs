@@ -5,14 +5,15 @@ using Microsoft.Data.SqlClient;
 using Dapper;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using CandidateManagement.Infrastructure;
 
-public class CandidateRepository : ICandidateRepository
+public class CandidateRepository : BaseRepository<Candidate>, ICandidateRepository
 {
-    private readonly string _connectionString;
+    private readonly Context _context;
 
     public CandidateRepository(string connectionString)
     {
-        _connectionString = connectionString;
+        _context = connectionString;
     }
 
     public async Task<Candidate> AddCandidateAsync(Candidate candidate)

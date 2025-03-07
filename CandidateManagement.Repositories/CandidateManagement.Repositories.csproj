@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CandidateManagement.Infrastructure\CandidateManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\CandidateManagement.Models\CandidateManagement.Models.csproj" />
   </ItemGroup>
 
