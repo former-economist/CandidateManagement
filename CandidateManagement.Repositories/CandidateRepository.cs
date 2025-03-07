@@ -1,9 +1,6 @@
 ﻿namespace CandidateManagement.Repositories;
 
-using Microsoft.Data.SqlClient;
-using Dapper;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using CandidateManagement.Infrastructure;
 using CandidateManagement.Infrastructure.Entity;
 using Microsoft.EntityFrameworkCore;

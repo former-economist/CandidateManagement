@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CandidateManagement.Exceptions\CandidateManagement.Exceptions.csproj" />
+    <ProjectReference Include="..\CandidateManagement.Infrastructure\CandidateManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\CandidateManagement.Repositories\CandidateManagement.Repositories.csproj" />
   </ItemGroup>
 

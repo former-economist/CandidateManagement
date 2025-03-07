@@ -1,6 +1,7 @@
 ﻿namespace CandidateManagement.Services;
 
 using CandidateManagement.Models;
+using CandidateManagement.Infrastructure.Entity;
 public interface ICandidateService
 {
     Task<IEnumerable<Candidate>> GetAllCandidatesAsync();

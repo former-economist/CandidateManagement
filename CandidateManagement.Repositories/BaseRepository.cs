@@ -24,7 +24,7 @@ namespace CandidateManagement.Repositories
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
-        };
+        }
         public async Task<Guid> DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);

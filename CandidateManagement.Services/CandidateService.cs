@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CandidateManagement.Exceptions;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories;
+using CandidateManagement.Infrastructure.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -25,12 +26,12 @@ public class CandidateService : ICandidateService
     public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
         _logger.LogInformation("Accessing all candidates");
-        return await _repository.GetCandidatesAsync();
+        return await _repository.GetAllAsync();
     }
 
     public async Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id)
     {
-        var candidate = await _repository.GetCandidateByIdAsync(id);
+        var candidate = await _repository.GetByIdAsync(id);
 
         if (candidate == null) 
         {
@@ -58,7 +59,7 @@ public class CandidateService : ICandidateService
             return isValidCandidate;
         }
         
-        var existingCandidate = await _repository.GetCandidateByEmailAsync(candidate.Email);
+        var existingCandidate = await _repository.GetByEmailAsync(candidate.Email);
         if (existingCandidate != null)
         {
             var problemDetails = new ProblemDetails
@@ -73,7 +74,7 @@ public class CandidateService : ICandidateService
             return Result<Candidate>.Failure(problemDetails)!;
         }
 
-        var addedCandidate = await _repository.AddCandidateAsync(candidate);
+        var addedCandidate = await _repository.AddAsync(candidate);
 
         _logger.LogInformation($"Added {addedCandidate.Id}");
 
@@ -98,15 +99,15 @@ public class CandidateService : ICandidateService
         }
         ValidateCandidate(candidate);
         
-        var updatedCandidate = await _repository.UpdateCandidateAsync(candidate);
+        var updatedCandidate = await _repository.UpdateAsync(candidate);
 
         _logger.LogInformation($"Candidate with ID {candidate.Id} update");
         return Result<Candidate>.Success(updatedCandidate);
     }
 
-    public async Task<Result<Candidate>> RemoveCandidateAsync(Guid id)
+    public async Task<Result<Candidate>> RemoveCandidateAsync(Candidate candidate)
     {
-        var deletedCandidate = await _repository.DeleteCandidateAsync(id);
+        var deletedCandidateID = await _repository.DeleteAsync(candidate);
         if(deletedCandidate == null)
         {
             var problemDetails = new ProblemDetails
@@ -248,7 +249,7 @@ public class CandidateService : ICandidateService
 
     private async Task<Candidate?> CheckIfCandidateExistsById(Guid id)
     {
-        return await _repository.GetCandidateByIdAsync(id); 
+        return await _repository.GetByIdAsync(id); 
     }
 }
 
