@@ -1,13 +1,9 @@
 ﻿namespace CandidateManagement.Repositories;
 
-using CandidateManagement.Models;
+using CandidateManagement.Infrastructure.Entity;
 
 public interface ICandidateRepository
 {
-    Task<IEnumerable<Candidate>> GetCandidatesAsync();
-    Task<Candidate> GetCandidateByIdAsync(Guid id);
-    Task<Candidate> AddCandidateAsync(Candidate candidate);
-    Task<Candidate> UpdateCandidateAsync(Candidate candidate);
-    Task<Candidate> DeleteCandidateAsync(Guid id);
-    Task<Candidate> GetCandidateByEmailAsync(string email);
+    
+    Task<Candidate> GetByEmailAsync(string email);
 }

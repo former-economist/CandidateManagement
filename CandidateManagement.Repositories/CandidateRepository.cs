@@ -1,6 +1,5 @@
 ﻿namespace CandidateManagement.Repositories;
 
-using CandidateManagement.Models;
 using Microsoft.Data.SqlClient;
 using Dapper;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ public class CandidateRepository : BaseRepository<Candidate>, ICandidateReposito
 
     public async Task<Candidate?> GetByEmailAsync(string email)
     {
-        return await _context.Candidate.SingleOrDefaultAsync(c => c.Email == email);
+        return await _context.Candidates.SingleOrDefaultAsync(c => c.Email == email);
     }
 }
 
