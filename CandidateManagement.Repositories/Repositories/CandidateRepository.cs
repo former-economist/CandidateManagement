@@ -1,8 +1,9 @@
-﻿namespace CandidateManagement.Repositories;
+﻿namespace CandidateManagement.Repositories.Repositories;
 
 using System.Threading.Tasks;
 using CandidateManagement.Infrastructure;
 using CandidateManagement.Infrastructure.Entity;
+using CandidateManagement.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 public class CandidateRepository : BaseRepository<Candidate>, ICandidateRepository

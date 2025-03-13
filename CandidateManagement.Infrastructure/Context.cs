@@ -6,6 +6,9 @@ namespace CandidateManagement.Infrastructure
     public class Context : DbContext
     {
         public DbSet<Candidate> Candidates { get; set; }
+        public DbSet<Centre> Centres { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Registration> Registrations { get; set; }
 
         private readonly DbContextOptions<Context> _dbContextOptions;
 

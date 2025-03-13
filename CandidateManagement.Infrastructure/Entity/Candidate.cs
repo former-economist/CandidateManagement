@@ -10,5 +10,9 @@
         public DateTime DateOfBirth { get; set; }
         public required string SwqrNumber { get; set; }
         public required string TelephoneNumber { get; set; }
+
+        public Guid CentreID { get; set; }
+        public Centre Centre { get; set; } = null!;
+        public ICollection<Registration> Registrations { get; } =  new List<Registration>();
     }
 }

@@ -1,12 +1,12 @@
 using System.Net.WebSockets;
-using CandidateManagement.Models;
-using CandidateManagement.Repositories;
+using CandidateManagement.Infrastructure.Entity;
 using CandidateManagement.Services;
 using CandidateManagement.Exceptions;
 
 using Moq;
 using Microsoft.Extensions.Logging;
 using System;
+using CandidateManagement.Repositories.Interfaces;
 
 namespace CandidateManagement.Tests
 {
@@ -18,7 +18,7 @@ namespace CandidateManagement.Tests
             var candidates = SampleCandidates();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.GetCandidatesAsync().Result)
+            mockRepository.Setup(x => x.GetAllAsync().Result)
                 .Returns(candidates);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -44,7 +44,7 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
+            mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidate);
 
             //Action
@@ -62,7 +62,7 @@ namespace CandidateManagement.Tests
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
+            mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
 
 
@@ -88,7 +88,7 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(candidate);
 
             //Action
@@ -107,7 +107,7 @@ namespace CandidateManagement.Tests
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             //Action
@@ -128,7 +128,7 @@ namespace CandidateManagement.Tests
             candidate.Email = string.Empty;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -148,7 +148,7 @@ namespace CandidateManagement.Tests
             candidate.Email = "exampletest";
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -169,7 +169,7 @@ namespace CandidateManagement.Tests
             candidate.DateOfBirth = DateTime.UtcNow;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -189,7 +189,7 @@ namespace CandidateManagement.Tests
             var existingCandidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.GetCandidateByEmailAsync(It.IsAny<string>()))
+            mockRepository.Setup(x => x.GetByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync(existingCandidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -215,14 +215,15 @@ namespace CandidateManagement.Tests
                 Surname = "Mclure",
                 Email = "adam.smith@example.com",
                 DateOfBirth = DateTime.UtcNow.Date.AddYears(-18),
-                SwqrNumber = "10012345"
+                SwqrNumber = "10012345",
+                TelephoneNumber = "1234567890"
             };
 
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.GetCandidateByIdAsync(It.IsAny<Guid>()))
+            mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeUpdated);
-            mockRepository.Setup(x => x.UpdateCandidateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(updatedCandidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -245,12 +246,12 @@ namespace CandidateManagement.Tests
 
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(candidateToBeDeleted);
+            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(candidateToBeDeleted.Id);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             
-            var actualOutput = await service.RemoveCandidateAsync(candidateToBeDeleted.Id);
+            var actualOutput = await service.RemoveCandidateAsync(candidateToBeDeleted);
 
             Assert.NotNull(actualOutput);
             Assert.Equal(actualOutput.Value.Id, candidateToBeDeleted.Id);
@@ -262,11 +263,11 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.DeleteCandidateAsync(It.IsAny<Guid>()))
-                .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
+            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
+                .ReturnsAsync(Guid.Empty);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
-            var outcome = service.RemoveCandidateAsync(candidate.Id);
+            var outcome = service.RemoveCandidateAsync(candidate);
 
             Assert.Null(outcome.Result.Value);
             Assert.Equal(false, outcome.Result.IsSuccess);
@@ -284,7 +285,8 @@ namespace CandidateManagement.Tests
                 Surname = "Smith",
                 Email = "adam.smith@example.com",
                 DateOfBirth = DateTime.UtcNow.Date.AddYears(-18),
-                SwqrNumber = "10012345"
+                SwqrNumber = "10012345",
+                TelephoneNumber = "1234567890"
             };
             return candidate;
         }
@@ -299,7 +301,8 @@ namespace CandidateManagement.Tests
                     Surname = "Smith",
                     Email = "adam.smith@example.com",
                     DateOfBirth = DateTime.Now,
-                    SwqrNumber = "10012345"
+                    SwqrNumber = "10012345",
+                    TelephoneNumber = "1234567890"
                 },
                 new Candidate
                 {
@@ -307,7 +310,8 @@ namespace CandidateManagement.Tests
                     Surname = "Smith",
                     Email = "alec.smith@example.com",
                     DateOfBirth = DateTime.Now,
-                    SwqrNumber = "10012344"
+                    SwqrNumber = "10012344",
+                    TelephoneNumber = "1234567891"
                 },
                 new Candidate
                 {
@@ -315,7 +319,8 @@ namespace CandidateManagement.Tests
                     Surname = "Smith",
                     Email = "barbara.smith@example.com",
                     DateOfBirth = DateTime.Now,
-                    SwqrNumber = "10012343"
+                    SwqrNumber = "10012343",
+                    TelephoneNumber = "1234567892"
                 }
             };
 

@@ -4,6 +4,7 @@ using CandidateManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CandidateManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250313141427_AddCentreAndCentreCandidateRelationship")]
+    partial class AddCentreAndCentreCandidateRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,61 +94,6 @@ namespace CandidateManagement.Infrastructure.Migrations
                     b.ToTable("Centres");
                 });
 
-            modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Course", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Course");
-                });
-
-            modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Registration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CandidateId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CandidateId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Registration");
-                });
-
-            modelBuilder.Entity("CentreCourse", b =>
-                {
-                    b.Property<Guid>("CentresId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CoursesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CentresId", "CoursesId");
-
-                    b.HasIndex("CoursesId");
-
-                    b.ToTable("CentreCourse");
-                });
-
             modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Candidate", b =>
                 {
                     b.HasOne("CandidateManagement.Infrastructure.Entity.Centre", "Centre")
@@ -157,53 +105,9 @@ namespace CandidateManagement.Infrastructure.Migrations
                     b.Navigation("Centre");
                 });
 
-            modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Registration", b =>
-                {
-                    b.HasOne("CandidateManagement.Infrastructure.Entity.Candidate", "Candidate")
-                        .WithMany("Registrations")
-                        .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CandidateManagement.Infrastructure.Entity.Course", "Course")
-                        .WithMany("Registrations")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Candidate");
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("CentreCourse", b =>
-                {
-                    b.HasOne("CandidateManagement.Infrastructure.Entity.Centre", null)
-                        .WithMany()
-                        .HasForeignKey("CentresId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CandidateManagement.Infrastructure.Entity.Course", null)
-                        .WithMany()
-                        .HasForeignKey("CoursesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Candidate", b =>
-                {
-                    b.Navigation("Registrations");
-                });
-
             modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Centre", b =>
                 {
                     b.Navigation("Candidates");
-                });
-
-            modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Course", b =>
-                {
-                    b.Navigation("Registrations");
                 });
 #pragma warning restore 612, 618
         }

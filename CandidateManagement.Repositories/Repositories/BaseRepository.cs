@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CandidateManagement.Infrastructure;
+using CandidateManagement.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace CandidateManagement.Repositories
+namespace CandidateManagement.Repositories.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         private readonly Context _context;
         private readonly DbSet<T> _dbSet;
 
-        public BaseRepository(Context context) 
+        public BaseRepository(Context context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = _context.Set<T>();

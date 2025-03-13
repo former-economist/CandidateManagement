@@ -1,7 +1,8 @@
 using CandidateManagement.Exceptions;
 using CandidateManagement.Infrastructure;
 using CandidateManagement.Infrastructure.Entity;
-using CandidateManagement.Repositories;
+using CandidateManagement.Repositories.Interfaces;
+using CandidateManagement.Repositories.Repositories;
 using CandidateManagement.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -15,16 +16,15 @@ builder.Logging.AddLog4Net();
 
 
 // Register services 
-
-builder.Services.AddScoped<ICandidateRepository>(provider => new CandidateRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddScoped<ICandidateService, CandidateService>();
-//builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
+
+// Register Db
 builder.Services.AddDbContext<Context>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
 
 var app = builder.Build();
 
@@ -57,7 +57,7 @@ app.MapPost("/candidates", async (Candidate candidate, ICandidateService service
 
 app.MapPut("/candidates", async (Candidate candidate, ICandidateService service) => await service.UpdateCandidateAsync(candidate));
 
-app.MapDelete("/candidates/{id}", async (Guid id, ICandidateService service) => await service.RemoveCandidateAsync(id));
+app.MapDelete("/candidates", async (Candidate candidate, ICandidateService service) => await service.RemoveCandidateAsync(candidate));
 
 
 
