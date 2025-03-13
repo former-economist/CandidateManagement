@@ -12,8 +12,8 @@ namespace CandidateManagement.Infrastructure.Entity
         public required string Name { get; set; }
 
         public Guid CandidateId { get; set; }
-        public Candidate Candidate { get; set; }
+        public Registration Candidate { get; set; }
         public Guid CourseId { get; set; }
-        public Course Course { get; set; }
+        public Registration Course { get; set; }
     }
 }

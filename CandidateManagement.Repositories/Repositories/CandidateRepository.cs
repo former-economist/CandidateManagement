@@ -6,7 +6,7 @@ using CandidateManagement.Infrastructure.Entity;
 using CandidateManagement.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-public class CandidateRepository : BaseRepository<Candidate>, ICandidateRepository
+public class CandidateRepository : BaseRepository<Registration>, ICandidateRepository
 {
     private readonly Context _context;
 
@@ -15,7 +15,7 @@ public class CandidateRepository : BaseRepository<Candidate>, ICandidateReposito
         _context = context;
     }
 
-    public async Task<Candidate?> GetByEmailAsync(string email)
+    public async Task<Registration?> GetByEmailAsync(string email)
     {
         return await _context.Candidates.SingleOrDefaultAsync(c => c.Email == email);
     }

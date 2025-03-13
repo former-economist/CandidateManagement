@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CandidateManagement.Infrastructure.Entity;
 
 namespace CandidateManagement.Repositories.Interfaces
 {
-    public class ICoursesRepository
+    public interface IRegistrationRepository : IBaseRepository<Registration>
     {
     }
 }

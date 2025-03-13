@@ -1,12 +1,12 @@
 using System.Net.WebSockets;
 using CandidateManagement.Infrastructure.Entity;
-using CandidateManagement.Services;
 using CandidateManagement.Exceptions;
 
 using Moq;
 using Microsoft.Extensions.Logging;
 using System;
 using CandidateManagement.Repositories.Interfaces;
+using CandidateManagement.Services.Services;
 
 namespace CandidateManagement.Tests
 {
@@ -63,7 +63,7 @@ namespace CandidateManagement.Tests
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
+                .ReturnsAsync<ICandidateRepository, Registration>(null as Registration);
 
 
             //Action
@@ -88,7 +88,7 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Registration>()))
                 .ReturnsAsync(candidate);
 
             //Action
@@ -107,12 +107,12 @@ namespace CandidateManagement.Tests
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
-                .ReturnsAsync(null as Candidate);
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Registration>()))
+                .ReturnsAsync(null as Registration);
 
             //Action
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
-            var outcome = service.CreateCandidateAsync(null as Candidate);
+            var outcome = service.CreateCandidateAsync(null as Registration);
 
             Assert.Equal(outcome.Result.IsSuccess, false);
             Assert.NotEqual(outcome.Result.ProblemDetails, null);
@@ -128,8 +128,8 @@ namespace CandidateManagement.Tests
             candidate.Email = string.Empty;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
-                .ReturnsAsync(null as Candidate);
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Registration>()))
+                .ReturnsAsync(null as Registration);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
@@ -148,8 +148,8 @@ namespace CandidateManagement.Tests
             candidate.Email = "exampletest";
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
-                .ReturnsAsync(null as Candidate);
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Registration>()))
+                .ReturnsAsync(null as Registration);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
 
@@ -169,8 +169,8 @@ namespace CandidateManagement.Tests
             candidate.DateOfBirth = DateTime.UtcNow;
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
-                .ReturnsAsync(null as Candidate);
+            mockRepository.Setup(x => x.AddAsync(It.IsAny<Registration>()))
+                .ReturnsAsync(null as Registration);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
@@ -208,7 +208,7 @@ namespace CandidateManagement.Tests
 
             var candidateToBeUpdated = SampleCandidate();
 
-            Candidate updatedCandidate = new Candidate()
+            Registration updatedCandidate = new Registration()
             {
                 Id = candidateToBeUpdated.Id,
                 Forename = "Troy",
@@ -223,7 +223,7 @@ namespace CandidateManagement.Tests
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeUpdated);
-            mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Registration>()))
                 .ReturnsAsync(updatedCandidate);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -246,7 +246,7 @@ namespace CandidateManagement.Tests
 
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Registration>()))
                 .ReturnsAsync(candidateToBeDeleted.Id);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -263,7 +263,7 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
-            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
+            mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Registration>()))
                 .ReturnsAsync(Guid.Empty);
 
             var service = new CandidateService(mockRepository.Object, mockLogger.Object);
@@ -276,9 +276,9 @@ namespace CandidateManagement.Tests
             Assert.Equal(404, outcome.Result.ProblemDetails.Status);
         }
 
-        private Candidate SampleCandidate()
+        private Registration SampleCandidate()
         {
-            var candidate = new Candidate()
+            var candidate = new Registration()
             {
                 Id = Guid.NewGuid(),
                 Forename = "Adam",
@@ -291,11 +291,11 @@ namespace CandidateManagement.Tests
             return candidate;
         }
 
-        private List<Candidate> SampleCandidates()
+        private List<Registration> SampleCandidates()
         {
-            List<Candidate> candidates = new List<Candidate>
+            List<Registration> candidates = new List<Registration>
             {
-                new Candidate
+                new Registration
                 {
                     Forename = "Adam",
                     Surname = "Smith",
@@ -304,7 +304,7 @@ namespace CandidateManagement.Tests
                     SwqrNumber = "10012345",
                     TelephoneNumber = "1234567890"
                 },
-                new Candidate
+                new Registration
                 {
                     Forename = "Alec",
                     Surname = "Smith",
@@ -313,7 +313,7 @@ namespace CandidateManagement.Tests
                     SwqrNumber = "10012344",
                     TelephoneNumber = "1234567891"
                 },
-                new Candidate
+                new Registration
                 {
                     Forename = "Barbara",
                     Surname = "Smith",

@@ -2,8 +2,8 @@
 
 using CandidateManagement.Infrastructure.Entity;
 
-public interface ICandidateRepository : IBaseRepository<Candidate>
+public interface ICandidateRepository : IBaseRepository<Registration>
 {
 
-    Task<Candidate> GetByEmailAsync(string email);
+    Task<Registration> GetByEmailAsync(string email);
 }
