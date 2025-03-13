@@ -8,5 +8,5 @@ public interface ICandidateService
     Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id);
     Task<Result<Candidate>> CreateCandidateAsync(Candidate candidate);
     Task<Result<Candidate>> UpdateCandidateAsync(Candidate candidate);
-    Task<Result<Candidate>> RemoveCandidateAsync(Guid id);
+    Task<Result<Candidate>> RemoveCandidateAsync(Candidate candidate);
 }

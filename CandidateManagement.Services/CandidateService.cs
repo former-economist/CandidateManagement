@@ -108,20 +108,20 @@ public class CandidateService : ICandidateService
     public async Task<Result<Candidate>> RemoveCandidateAsync(Candidate candidate)
     {
         var deletedCandidateID = await _repository.DeleteAsync(candidate);
-        if(deletedCandidate == null)
+        if(deletedCandidateID == Guid.Empty)
         {
             var problemDetails = new ProblemDetails
             {
                 Title = "Candidate not found",
-                Detail = $"Candidate with ID {id} not found, cannot be deleted",
+                Detail = $"Candidate with ID {candidate.Id} not found, cannot be deleted",
                 Status = 404
             };
 
-            _logger.LogError($"Unable to remove candidate: {id}");
+            _logger.LogError($"Unable to remove candidate: {candidate.Id}");
             return Result<Candidate>.Failure(problemDetails);
             
         }
-        var isCandidateStillExist = await CheckIfCandidateExistsById(id);
+        var isCandidateStillExist = await CheckIfCandidateExistsById(candidate.Id);
 
         if (isCandidateStillExist != null)
         {
@@ -137,8 +137,8 @@ public class CandidateService : ICandidateService
             
         }
 
-        _logger.LogInformation($"Candidate with ID {id} removed");
-        return Result<Candidate>.Success(deletedCandidate);
+        _logger.LogInformation($"Candidate with ID {candidate.Id} removed");
+        return Result<Candidate>.Success(candidate);
     }
 
     private Result<Candidate> ValidateCandidate(Candidate candidate)
