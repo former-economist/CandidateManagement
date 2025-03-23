@@ -1,39 +1,221 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using CandidateManagement.Infrastructure.Entity;
 using CandidateManagement.Models;
+using CandidateManagement.Repositories.Interfaces;
 using CandidateManagement.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CandidateManagement.Services.Services
 {
     public class CentreService : ICentreService
     {
-        public Task<Result<Registration>> CreateAsync(Registration centre)
+        private readonly ILogger _logger;
+        private readonly ICentreRepository _repository;
+
+        public CentreService(ICentreRepository repository, ILogger<CentreService> logger)
         {
-            throw new NotImplementedException();
+            _logger = logger;
+            _repository = repository;
         }
 
-        public Task<IEnumerable<Registration>> GetAllAsync()
+        public async Task<Result<Centre>> CreateAsync(Centre centre)
         {
-            throw new NotImplementedException();
+            var isValidCentre = ValidateCentre(centre);
+            if (!isValidCentre.IsSuccess)
+            {
+                _logger.LogError($"{isValidCentre.ProblemDetails.Detail}");
+                return isValidCentre;
+            }
+            var existingCentre = await _repository.GetByEmailAsync(centre.Email);
+            if (existingCentre != null)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Duplicate Candidate",
+                    Detail = $"Centre already exist with given email {centre.Email}",
+                    Status = 400
+                };
+
+                _logger.LogError($"Canidate already exist with given email {centre.Email}");
+
+                return Result<Centre>.Failure(problemDetails)!;
+            }
+
+            var addedCentre = await _repository.AddAsync(centre);
+
+            _logger.LogInformation($"Added {addedCentre.Id}");
+
+            return Result<Centre>.Success(centre);
         }
 
-        public Task<Result<Registration?>> GetByIdAsync(Guid id)
+        public async Task<IEnumerable<Centre>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Accessing all centres");
+            return await _repository.GetAllAsync();
         }
 
-        public Task<Result<Registration>> RemoveAsync(Registration centre)
+        public async Task<Result<Centre?>> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var centre = await _repository.GetByIdAsync(id);
+
+            if (centre == null)
+            {
+                _logger.LogError($"Centre with ID {id} not found");
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Centre not found",
+                    Detail = $"Centre with ID {id} not found",
+                    Status = 404
+                };
+                return Result<Centre>.Failure(problemDetails);
+            }
+            _logger.LogInformation("Centre Exists");
+            return Result<Centre>.Success(centre)!;
         }
 
-        public Task<Result<Registration>> UpdateAsync(Registration centre)
+        public async Task<Result<Centre>> RemoveAsync(Centre centre)
         {
-            throw new NotImplementedException();
+            var deletedCentreID = await _repository.DeleteAsync(centre);
+            if (deletedCentreID == Guid.Empty)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Centre not found",
+                    Detail = $"Centre with ID {centre.Id} not found, cannot be deleted",
+                    Status = 404
+                };
+
+                _logger.LogError($"Unable to remove centre: {centre.Id}");
+                return Result<Centre>.Failure(problemDetails);
+
+            }
+            var isCentreStillExist = await CheckIfCentreExistsById(centre.Id);
+
+            if (isCentreStillExist != null)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Action not completed",
+                    Detail = "Record not deleted",
+                    Status = 500
+                };
+
+                _logger.LogError($"Record not deleted after attempt to delete");
+                return Result<Centre>.Failure(problemDetails);
+
+            }
+
+            _logger.LogInformation($"Centre with ID {centre.Id} removed");
+            return Result<Centre>.Success(centre);
+        }
+
+        public async Task<Result<Centre>> UpdateAsync(Centre centre)
+        {
+            var isCentreExist = await CheckIfCentreExistsById(centre.Id);
+            if (isCentreExist == null)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Centre not found",
+                    Detail = $"Centre with ID {centre.Id} not found",
+                    Status = 404
+                };
+
+                _logger.LogError($"Centre with ID {centre.Id} not found");
+                return Result<Centre>.Failure(problemDetails);
+
+            }
+            ValidateCentre(centre);
+
+            var updatedCentre = await _repository.UpdateAsync(centre);
+
+            _logger.LogInformation($"Centre with ID {centre.Id} update");
+            return Result<Centre>.Success(updatedCentre);
+        }
+
+        private Result<Centre> ValidateCentre(Centre centre)
+        {
+            if (centre == null)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "No input data provided",
+                    Detail = "Null Centre object provided",
+                    Status = 400
+                };
+
+                _logger.LogError("Null Centre object");
+
+                return Result<Centre>.Failure(problemDetails);
+            }
+            if (string.IsNullOrWhiteSpace(centre.Name))
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Insufficient Centre data provided",
+                    Detail = "Centre Name not provided",
+                    Status = 400
+                };
+
+                _logger.LogError("Centre Name not provided");
+
+                return Result<Centre>.Failure(problemDetails);
+            }
+            if (string.IsNullOrWhiteSpace(centre.Email))
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Insufficient Centre data provided",
+                    Detail = "Centre Email not provided",
+                    Status = 400
+                };
+
+                _logger.LogError("Centre email not provided");
+
+                return Result<Centre>.Failure(problemDetails);
+            }
+            if (string.IsNullOrWhiteSpace(centre.Address))
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Insufficient Centre data provided",
+                    Detail = "Centre Address not provided",
+                    Status = 400
+                };
+
+                _logger.LogError("Centre Address not provided");
+
+                return Result<Centre>.Failure(problemDetails);
+            }
+            if (string.IsNullOrWhiteSpace(centre.TelephoneNumber))
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Insufficient Centre data provided",
+                    Detail = "Centre Telephone Number not provided",
+                    Status = 400
+                };
+
+                _logger.LogError("Centre Telephone Number not provided");
+
+                return Result<Centre>.Failure(problemDetails);
+            }
+
+
+            return Result<Centre>.Success(centre);
+
+
+        }
+
+        private async Task<Centre?> CheckIfCentreExistsById(Guid id)
+        {
+            return await _repository.GetByIdAsync(id);
         }
     }
 }

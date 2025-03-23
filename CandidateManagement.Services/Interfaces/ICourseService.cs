@@ -10,10 +10,10 @@ namespace CandidateManagement.Services.Interfaces
 {
     public interface ICourseService
     {
-        Task<IEnumerable<Registration>> GetAllAsync();
-        Task<Result<Registration?>> GetByIdAsync(Guid id);
-        Task<Result<Registration>> CreateAsync(Registration course);
-        Task<Result<Registration>> UpdateAsync(Registration course);
-        Task<Result<Registration>> RemoveAsync(Registration course);
+        Task<IEnumerable<Course>> GetAllAsync();
+        Task<Result<Course?>> GetByIdAsync(Guid id);
+        Task<Result<Course>> CreateAsync(Course course);
+        Task<Result<Course>> UpdateAsync(Course course);
+        Task<Result<Course>> RemoveAsync(Course course);
     }
 }

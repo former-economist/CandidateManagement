@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CandidateManagement.Infrastructure.Entity
 {
-    public class Registration
+    public class Centre
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
@@ -15,7 +15,7 @@ namespace CandidateManagement.Infrastructure.Entity
         public required bool Certified { get; set; }
         public required string TelephoneNumber { get; set; }
 
-        public ICollection<Registration> Candidates { get;} = new List<Registration>();
-        public ICollection<Registration> Courses { get; } = new List<Registration>();
+        //public virtual ICollection<Candidate> Candidates { get;} = new List<Candidate>();
+        //public virtual ICollection<Course> Courses { get; } = new List<Course>();
     }
 }

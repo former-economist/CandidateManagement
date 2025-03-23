@@ -10,10 +10,10 @@ namespace CandidateManagement.Services.Interfaces
 {
     public interface ICentreService
     {
-        Task<IEnumerable<Registration>> GetAllAsync();
-        Task<Result<Registration?>> GetByIdAsync(Guid id);
-        Task<Result<Registration>> CreateAsync(Registration centre);
-        Task<Result<Registration>> UpdateAsync(Registration centre);
-        Task<Result<Registration>> RemoveAsync(Registration centre);
+        Task<IEnumerable<Centre>> GetAllAsync();
+        Task<Result<Centre?>> GetByIdAsync(Guid id);
+        Task<Result<Centre>> CreateAsync(Centre centre);
+        Task<Result<Centre>> UpdateAsync(Centre centre);
+        Task<Result<Centre>> RemoveAsync(Centre centre);
     }
 }

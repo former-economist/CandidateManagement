@@ -1,7 +1,7 @@
 ﻿namespace CandidateManagement.Infrastructure.Entity
 
 {
-    public class Registration
+    public class Candidate
     {
         public Guid Id { get; set; }
         public required string Forename { get; set; }
@@ -12,7 +12,7 @@
         public required string TelephoneNumber { get; set; }
 
         public Guid CentreID { get; set; }
-        public Registration Centre { get; set; } = null!;
-        public ICollection<Registration> Registrations { get; } =  new List<Registration>();
+        public virtual Centre Centre { get; set; } = null!;
+        //public virtual ICollection<Registration> Registrations { get; } =  new List<Registration>();
     }
 }

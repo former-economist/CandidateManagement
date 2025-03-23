@@ -5,10 +5,10 @@ namespace CandidateManagement.Infrastructure
 {
     public class Context : DbContext
     {
-        public DbSet<Registration> Candidates { get; set; }
-        public DbSet<Registration> Centres { get; set; }
-        public DbSet<Registration> Courses { get; set; }
-        public DbSet<Registration> Registrations { get; set; }
+        public DbSet<Candidate> Candidates { get; set; }
+        public DbSet<Centre> Centres { get; set; }
+        //public DbSet<Course> Courses { get; set; }
+        //public DbSet<Registration> Registrations { get; set; }
 
         private readonly DbContextOptions<Context> _dbContextOptions;
 
@@ -19,11 +19,26 @@ namespace CandidateManagement.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-
+            base.OnModelCreating(modelBuilder);
             
 
-            //modelBuilder.Entity<Candidate>().HasData(candidate1, candidate2, candidate3, candidate4, candidate5, candidate6, candidate7, candidate8, candidate9, candidate10);
+            var centre = new Centre
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tech Skills Academy",
+                Address = "45 Tech Avenue, Manchester, UK",
+                Email = "contact@techskills.com",
+                Certified = true,
+                TelephoneNumber = "0161-9876-5432"
+            };
+
+            var candidate = new Candidate { Forename = "John", Surname = "Smith", Email = "john.smith@example.com", DateOfBirth = new DateTime(1990, 3, 15), SwqrNumber = "10012345", TelephoneNumber = "0987654321", Id = Guid.NewGuid(), CentreID = centre.Id };
+
+            modelBuilder.Entity<Centre>().HasData(centre);
+
+            modelBuilder.Entity<Candidate>().HasData(candidate);
+
+            
         }
     }
 }

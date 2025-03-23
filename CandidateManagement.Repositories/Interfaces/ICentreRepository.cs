@@ -7,7 +7,9 @@ using CandidateManagement.Infrastructure.Entity;
 
 namespace CandidateManagement.Repositories.Interfaces
 {
-    public interface ICentreRepository: IBaseRepository<Registration>
+    public interface ICentreRepository: IBaseRepository<Centre>
     {
+        Task<Centre> GetByEmailAsync(string email);
     }
+
 }

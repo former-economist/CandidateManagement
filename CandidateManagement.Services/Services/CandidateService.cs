@@ -24,13 +24,13 @@ public class CandidateService : ICandidateService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<Registration>> GetAllCandidatesAsync()
+    public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
         _logger.LogInformation("Accessing all candidates");
         return await _repository.GetAllAsync();
     }
 
-    public async Task<Result<Registration?>> GetCandidateByIdAsync(Guid id)
+    public async Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id)
     {
         var candidate = await _repository.GetByIdAsync(id);
 
@@ -43,15 +43,15 @@ public class CandidateService : ICandidateService
                 Detail = $"Candidate with ID {id} not found",
                 Status = 404
             };
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         _logger.LogInformation("Candidate Exists");
-        return Result<Registration>.Success(candidate)!;
+        return Result<Candidate>.Success(candidate)!;
 
 
     }
 
-    public async Task<Result<Registration>> CreateCandidateAsync(Registration candidate)
+    public async Task<Result<Candidate>> CreateCandidateAsync(Candidate candidate)
     {
         var isValidCandidate = ValidateCandidate(candidate);
 
@@ -73,17 +73,17 @@ public class CandidateService : ICandidateService
 
             _logger.LogError($"Canidate already exist with given email {candidate.Email}");
 
-            return Result<Registration>.Failure(problemDetails)!;
+            return Result<Candidate>.Failure(problemDetails)!;
         }
 
         var addedCandidate = await _repository.AddAsync(candidate);
 
         _logger.LogInformation($"Added {addedCandidate.Id}");
 
-        return Result<Registration>.Success(candidate);
+        return Result<Candidate>.Success(candidate);
     }
 
-    public async Task<Result<Registration>> UpdateCandidateAsync(Registration candidate)
+    public async Task<Result<Candidate>> UpdateCandidateAsync(Candidate candidate)
     {
         var isCandidateExist = await CheckIfCandidateExistsById(candidate.Id);
         if (isCandidateExist == null)
@@ -96,7 +96,7 @@ public class CandidateService : ICandidateService
             };
 
             _logger.LogError($"Candidate with ID {candidate.Id} not found");
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
 
         }
         ValidateCandidate(candidate);
@@ -104,10 +104,10 @@ public class CandidateService : ICandidateService
         var updatedCandidate = await _repository.UpdateAsync(candidate);
 
         _logger.LogInformation($"Candidate with ID {candidate.Id} update");
-        return Result<Registration>.Success(updatedCandidate);
+        return Result<Candidate>.Success(updatedCandidate);
     }
 
-    public async Task<Result<Registration>> RemoveCandidateAsync(Registration candidate)
+    public async Task<Result<Candidate>> RemoveCandidateAsync(Candidate candidate)
     {
         var deletedCandidateID = await _repository.DeleteAsync(candidate);
         if (deletedCandidateID == Guid.Empty)
@@ -120,7 +120,7 @@ public class CandidateService : ICandidateService
             };
 
             _logger.LogError($"Unable to remove candidate: {candidate.Id}");
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
 
         }
         var isCandidateStillExist = await CheckIfCandidateExistsById(candidate.Id);
@@ -135,15 +135,15 @@ public class CandidateService : ICandidateService
             };
 
             _logger.LogError($"Record not deleted after attempt to delete");
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
 
         }
 
         _logger.LogInformation($"Candidate with ID {candidate.Id} removed");
-        return Result<Registration>.Success(candidate);
+        return Result<Candidate>.Success(candidate);
     }
 
-    private Result<Registration> ValidateCandidate(Registration candidate)
+    private Result<Candidate> ValidateCandidate(Candidate candidate)
     {
         if (candidate == null)
         {
@@ -156,7 +156,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Null candidate object");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Forename))
         {
@@ -169,7 +169,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate forename not provided");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Surname))
         {
@@ -182,7 +182,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate surname not provided");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.Email))
         {
@@ -195,7 +195,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate email not provided");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (string.IsNullOrWhiteSpace(candidate.DateOfBirth.ToString()))
         {
@@ -208,7 +208,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate date of birth not provided");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         if (!CandidateIs18OrOver(candidate))
         {
@@ -221,7 +221,7 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate does not meet age restriction");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
         var emailValid = Regex.IsMatch(candidate.Email,
                 @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
@@ -237,19 +237,19 @@ public class CandidateService : ICandidateService
 
             _logger.LogError("Candidate email is invalid format");
 
-            return Result<Registration>.Failure(problemDetails);
+            return Result<Candidate>.Failure(problemDetails);
         }
 
-        return Result<Registration>.Success(candidate);
+        return Result<Candidate>.Success(candidate);
     }
 
-    private bool CandidateIs18OrOver(Registration candidate)
+    private bool CandidateIs18OrOver(Candidate candidate)
     {
         var minBirthDate = DateTime.UtcNow.Date.AddYears(-18);
         return candidate.DateOfBirth.Date <= minBirthDate ? true : false;
     }
 
-    private async Task<Registration?> CheckIfCandidateExistsById(Guid id)
+    private async Task<Candidate?> CheckIfCandidateExistsById(Guid id)
     {
         return await _repository.GetByIdAsync(id);
     }

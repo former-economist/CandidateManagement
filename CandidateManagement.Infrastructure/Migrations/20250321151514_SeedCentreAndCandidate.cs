@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CandidateManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddRegistrationsAndCourses : Migration
+    public partial class SeedCentreAndCandidate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,6 +73,16 @@ namespace CandidateManagement.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Centres",
+                columns: new[] { "Id", "Address", "Certified", "Email", "Name", "TelephoneNumber" },
+                values: new object[] { new Guid("be769429-abe0-4446-aa60-51a45fe64dc3"), "45 Tech Avenue, Manchester, UK", true, "contact@techskills.com", "Tech Skills Academy", "0161-9876-5432" });
+
+            migrationBuilder.InsertData(
+                table: "Candidates",
+                columns: new[] { "Id", "CentreID", "DateOfBirth", "Email", "Forename", "Surname", "SwqrNumber", "TelephoneNumber" },
+                values: new object[] { new Guid("d82d5a9c-4488-4a15-8134-32b2c69b42d4"), new Guid("be769429-abe0-4446-aa60-51a45fe64dc3"), new DateTime(1990, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.smith@example.com", "John", "Smith", "10012345", "0987654321" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CentreCourse_CoursesId",
                 table: "CentreCourse",
@@ -100,6 +110,16 @@ namespace CandidateManagement.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Course");
+
+            migrationBuilder.DeleteData(
+                table: "Candidates",
+                keyColumn: "Id",
+                keyValue: new Guid("d82d5a9c-4488-4a15-8134-32b2c69b42d4"));
+
+            migrationBuilder.DeleteData(
+                table: "Centres",
+                keyColumn: "Id",
+                keyValue: new Guid("be769429-abe0-4446-aa60-51a45fe64dc3"));
         }
     }
 }

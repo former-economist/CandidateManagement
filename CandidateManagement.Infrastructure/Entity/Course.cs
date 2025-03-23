@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace CandidateManagement.Infrastructure.Entity
 {
-    public class Registration
+    public class Course
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
 
-        public ICollection<Registration> Centres { get; } = new List<Registration>();
-        public ICollection<Registration> Registrations { get; } = new List<Registration>();
+        public virtual ICollection<Centre> Centres { get; } = new List<Centre>();
+        public virtual ICollection<Registration?> Registrations { get; } = new List<Registration>();
     }
 }

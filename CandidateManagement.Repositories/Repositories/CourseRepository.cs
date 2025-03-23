@@ -9,7 +9,7 @@ using CandidateManagement.Repositories.Interfaces;
 
 namespace CandidateManagement.Repositories.Repositories
 {
-    public class CourseRepository : BaseRepository<Registration>, ICourseRepository
+    public class CourseRepository : BaseRepository<Course>, ICourseRepository
     {
         private readonly Context _context;
         public CourseRepository(Context context) : base(context)

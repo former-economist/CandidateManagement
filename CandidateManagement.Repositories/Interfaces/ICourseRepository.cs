@@ -7,7 +7,7 @@ using CandidateManagement.Infrastructure.Entity;
 
 namespace CandidateManagement.Repositories.Interfaces
 {
-    public interface ICourseRepository : IBaseRepository<Registration>
+    public interface ICourseRepository : IBaseRepository<Course>
     {
     }
 }

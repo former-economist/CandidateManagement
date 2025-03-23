@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CandidateManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250313152330_AddRegistrationsAndCourses")]
-    partial class AddRegistrationsAndCourses
+    [Migration("20250321151514_SeedCentreAndCandidate")]
+    partial class SeedCentreAndCandidate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,19 @@ namespace CandidateManagement.Infrastructure.Migrations
                     b.HasIndex("CentreID");
 
                     b.ToTable("Candidates");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d82d5a9c-4488-4a15-8134-32b2c69b42d4"),
+                            CentreID = new Guid("be769429-abe0-4446-aa60-51a45fe64dc3"),
+                            DateOfBirth = new DateTime(1990, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "john.smith@example.com",
+                            Forename = "John",
+                            Surname = "Smith",
+                            SwqrNumber = "10012345",
+                            TelephoneNumber = "0987654321"
+                        });
                 });
 
             modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Centre", b =>
@@ -92,6 +105,17 @@ namespace CandidateManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Centres");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("be769429-abe0-4446-aa60-51a45fe64dc3"),
+                            Address = "45 Tech Avenue, Manchester, UK",
+                            Certified = true,
+                            Email = "contact@techskills.com",
+                            Name = "Tech Skills Academy",
+                            TelephoneNumber = "0161-9876-5432"
+                        });
                 });
 
             modelBuilder.Entity("CandidateManagement.Infrastructure.Entity.Course", b =>

@@ -4,9 +4,9 @@ using CandidateManagement.Models;
 using CandidateManagement.Infrastructure.Entity;
 public interface ICandidateService
 {
-    Task<IEnumerable<Registration>> GetAllCandidatesAsync();
-    Task<Result<Registration?>> GetCandidateByIdAsync(Guid id);
-    Task<Result<Registration>> CreateCandidateAsync(Registration candidate);
-    Task<Result<Registration>> UpdateCandidateAsync(Registration candidate);
-    Task<Result<Registration>> RemoveCandidateAsync(Registration candidate);
+    Task<IEnumerable<Candidate>> GetAllCandidatesAsync();
+    Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id);
+    Task<Result<Candidate>> CreateCandidateAsync(Candidate candidate);
+    Task<Result<Candidate>> UpdateCandidateAsync(Candidate candidate);
+    Task<Result<Candidate>> RemoveCandidateAsync(Candidate candidate);
 }
