@@ -16,12 +16,14 @@ namespace CandidateManagement.Services.Services
     public class CentreService : ICentreService
     {
         private readonly ILogger _logger;
-        private readonly ICentreRepository _repository;
+        private readonly ICandidateRepository _candidateRepository;
+        private readonly ICentreRepository _centreRepository;
 
-        public CentreService(ICentreRepository repository, ILogger<CentreService> logger)
+        public CentreService(ICentreRepository repository, ICandidateRepository candidateRepository, ILogger<CentreService> logger)
         {
             _logger = logger;
-            _repository = repository;
+            _candidateRepository = candidateRepository;
+            _centreRepository = repository;
         }
 
         public async Task<Result<Centre>> CreateAsync(Centre centre)
@@ -32,7 +34,7 @@ namespace CandidateManagement.Services.Services
                 _logger.LogError($"{isValidCentre.ProblemDetails.Detail}");
                 return isValidCentre;
             }
-            var existingCentre = await _repository.GetByEmailAsync(centre.Email);
+            var existingCentre = await _centreRepository.GetByEmailAsync(centre.Email);
             if (existingCentre != null)
             {
                 var problemDetails = new ProblemDetails
@@ -47,7 +49,7 @@ namespace CandidateManagement.Services.Services
                 return Result<Centre>.Failure(problemDetails)!;
             }
 
-            var addedCentre = await _repository.AddAsync(centre);
+            var addedCentre = await _centreRepository.AddAsync(centre);
 
             _logger.LogInformation($"Added {addedCentre.Id}");
 
@@ -57,12 +59,14 @@ namespace CandidateManagement.Services.Services
         public async Task<IEnumerable<Centre>> GetAllAsync()
         {
             _logger.LogInformation("Accessing all centres");
-            return await _repository.GetAllAsync();
+
+            return await _centreRepository.GetCentresWithCandidates();
+            
         }
 
         public async Task<Result<Centre?>> GetByIdAsync(Guid id)
         {
-            var centre = await _repository.GetByIdAsync(id);
+            var centre = await _centreRepository.GetCentreByIdAsync(id);
 
             if (centre == null)
             {
@@ -81,7 +85,7 @@ namespace CandidateManagement.Services.Services
 
         public async Task<Result<Centre>> RemoveAsync(Centre centre)
         {
-            var deletedCentreID = await _repository.DeleteAsync(centre);
+            var deletedCentreID = await _centreRepository.DeleteAsync(centre);
             if (deletedCentreID == Guid.Empty)
             {
                 var problemDetails = new ProblemDetails
@@ -133,7 +137,7 @@ namespace CandidateManagement.Services.Services
             }
             ValidateCentre(centre);
 
-            var updatedCentre = await _repository.UpdateAsync(centre);
+            var updatedCentre = await _centreRepository.UpdateAsync(centre);
 
             _logger.LogInformation($"Centre with ID {centre.Id} update");
             return Result<Centre>.Success(updatedCentre);
@@ -215,7 +219,7 @@ namespace CandidateManagement.Services.Services
 
         private async Task<Centre?> CheckIfCentreExistsById(Guid id)
         {
-            return await _repository.GetByIdAsync(id);
+            return await _centreRepository.GetByIdAsync(id);
         }
     }
 }

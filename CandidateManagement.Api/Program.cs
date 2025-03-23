@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CandidateManagement.Exceptions;
 using CandidateManagement.Infrastructure;
 using CandidateManagement.Infrastructure.Entity;
@@ -8,7 +9,7 @@ using CandidateManagement.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.Proxies;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +27,15 @@ builder.Services.AddScoped<ICentreService, CentreService>();
 builder.Services.AddDbContext<Context>(options =>
 {
     options
-    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    .UseLazyLoadingProxies();
+    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNameCaseInsensitive = false;
+    options.SerializerOptions.PropertyNamingPolicy = null;
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.WriteIndented = true;
 });
 
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
@@ -48,6 +56,8 @@ app.UseStatusCodePages();
 // Map endpoints 
 
 app.MapGet("/centres", async(ICentreService service) => await service.GetAllAsync());
+
+app.MapGet("/centres/{id}", async(Guid id,ICentreService service) => await service.GetByIdAsync(id));
 
 app.MapPost("/centres", async (Centre centre, ICentreService service) => await service.CreateAsync(centre));
 

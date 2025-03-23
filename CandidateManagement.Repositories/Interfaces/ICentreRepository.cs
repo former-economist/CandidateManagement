@@ -9,7 +9,9 @@ namespace CandidateManagement.Repositories.Interfaces
 {
     public interface ICentreRepository: IBaseRepository<Centre>
     {
+        Task<IEnumerable<Centre>> GetCentresWithCandidates();
         Task<Centre> GetByEmailAsync(string email);
+        Task<Centre> GetCentreByIdAsync(Guid id);
     }
 
 }

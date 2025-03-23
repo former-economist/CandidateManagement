@@ -18,6 +18,16 @@ namespace CandidateManagement.Repositories.Repositories
             _context = context;
         }
 
+        public async Task<Centre> GetCentreByIdAsync(Guid id)
+        {
+            return await _context.Centres.Where(centre => centre.Id == id).Include(centre => centre.Candidates).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Centre>> GetCentresWithCandidates()
+        {
+            return await _context.Centres.Include(centre => centre.Candidates).ToListAsync();
+        }
+
         public async Task<Centre?> GetByEmailAsync(string email)
         {
             return await _context.Centres.SingleOrDefaultAsync(c => c.Email == email);

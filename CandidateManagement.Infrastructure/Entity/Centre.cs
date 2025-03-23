@@ -15,7 +15,7 @@ namespace CandidateManagement.Infrastructure.Entity
         public required bool Certified { get; set; }
         public required string TelephoneNumber { get; set; }
 
-        //public virtual ICollection<Candidate> Candidates { get;} = new List<Candidate>();
+        public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
         //public virtual ICollection<Course> Courses { get; } = new List<Course>();
     }
 }
