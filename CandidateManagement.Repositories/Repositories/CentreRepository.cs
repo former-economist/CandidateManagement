@@ -35,7 +35,7 @@ namespace CandidateManagement.Repositories.Repositories
 
         public async Task<IEnumerable<Centre>> GetCentresWithCandidates()
         {
-            return await _context.Centres.Include(centre => centre.Candidates).ToListAsync();
+            return await _context.Centres.Include(centre => centre.Candidates).Include(centre => centre.Courses).ToListAsync();
         }
 
         public async Task<Centre?> GetByEmailAsync(string email)
@@ -43,5 +43,10 @@ namespace CandidateManagement.Repositories.Repositories
             return await _context.Centres.SingleOrDefaultAsync(c => c.Email == email);
 
         }
+
+        //public async Task<Centre> UpdateCentreCourse()
+        //{
+
+        //}
     }
 }

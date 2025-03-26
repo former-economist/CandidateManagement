@@ -9,5 +9,8 @@ namespace CandidateManagement.Repositories.Interfaces
 {
     public interface ICourseRepository : IBaseRepository<Course>
     {
+        Task<IEnumerable<Course>> GetAllCoursesAndCentresAsync();
+
+        Task UpdateCourseCentresAsync(Course course, Centre newCentre);
     }
 }

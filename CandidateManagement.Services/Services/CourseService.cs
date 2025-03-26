@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CandidateManagement.Infrastructure.Entity;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories.Interfaces;
+using CandidateManagement.Repositories.Repositories;
 using CandidateManagement.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,14 +16,14 @@ namespace CandidateManagement.Services.Services
 {
     public class CourseService : ICourseService
     {
-        private readonly ICourseRepository _repository;
-        private readonly ICentreRepository _courseRepository;
+        private readonly ICourseRepository _courseRepository;
+        private readonly ICentreRepository _centreRepository;
         private readonly ILogger _logger;
 
         public CourseService(ICourseRepository repository, ICentreRepository centreRepository, ILogger<CourseService> logger)
         {
-            _repository = repository;
-            _courseRepository = centreRepository;
+            _courseRepository = repository;
+            _centreRepository = centreRepository;
             _logger = logger;
         }
 
@@ -36,14 +37,14 @@ namespace CandidateManagement.Services.Services
                 return isValidCourse;
             }
 
-            _repository.AddAsync(course);
+            _courseRepository.AddAsync(course);
 
             return Result<Course>.Success(course);
         }
 
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            return await _courseRepository.GetAllCoursesAndCentresAsync();
         }
 
         public Task<Result<Course?>> GetByIdAsync(Guid id)
@@ -56,9 +57,21 @@ namespace CandidateManagement.Services.Services
             throw new NotImplementedException();
         }
 
+        public async Task TaskUpdateOrCreate(Course course)
+        {
+            if(await CheckCourseExistsAsync(course))
+            {
+
+            }
+        }
+
         public Task<Result<Course>> UpdateAsync(Course course)
         {
             throw new NotImplementedException();
+            //if (_courserepository.CheckCourseExists(course))
+            //{
+            //    course
+            //}
         }
 
         private Result<Course> ValidateCourse(Course course)
@@ -106,9 +119,20 @@ namespace CandidateManagement.Services.Services
             return Result<Course>.Success(course);
         }
 
-        private async Task<Centre> CheckCentreExists(Centre centre) 
+        //private async Task<Centre> CheckCentreExists(Centre centre)
+        //{
+        //    return await _courseRepository.GetByIdAsync(centre.Id);
+        //}
+
+        private async Task<bool> CheckCourseExistsAsync(Course course)
         {
-            return await _courseRepository.GetByIdAsync(centre.Id);
+            var doesCourseExist = await _courseRepository.GetByIdAsync(course.Id);
+
+            if (doesCourseExist == null) { 
+                return false;
+            }
+
+            return true;
         }
     }
 }

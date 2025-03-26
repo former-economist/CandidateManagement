@@ -66,6 +66,8 @@ app.MapGet("/centres/{id}", async(Guid id,ICentreService service) => await servi
 
 app.MapPost("/centres", async (Centre centre, ICentreService service) => await service.CreateAsync(centre));
 
+app.MapPut("/centre-courses", async (Centre centre, ICentreService service) => await service.UpdateCentreCoures(centre));
+
 app.MapGet("/candidates", async (ICandidateService service) => await service.GetAllCandidatesAsync());
 
 app.MapGet("/candidates/{id}", async (Guid id, ICandidateService service) =>

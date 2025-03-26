@@ -15,5 +15,7 @@ namespace CandidateManagement.Services.Interfaces
         Task<Result<Centre>> CreateAsync(Centre centre);
         Task<Result<Centre>> UpdateAsync(Centre centre);
         Task<Result<Centre>> RemoveAsync(Centre centre);
+
+        Task<Result<Centre>> UpdateCentreCoures(Centre centre);
     }
 }

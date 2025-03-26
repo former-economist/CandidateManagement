@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CandidateManagement.Infrastructure.Entity;
 using CandidateManagement.Models;
 using CandidateManagement.Repositories.Interfaces;
+using CandidateManagement.Repositories.Repositories;
 using CandidateManagement.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,11 +19,14 @@ namespace CandidateManagement.Services.Services
         private readonly ILogger _logger;
         private readonly ICandidateRepository _candidateRepository;
         private readonly ICentreRepository _centreRepository;
+        private readonly ICourseRepository _courseRepository;
+        private readonly ICourseService _courseService;
 
-        public CentreService(ICentreRepository repository, ICandidateRepository candidateRepository, ILogger<CentreService> logger)
+        public CentreService(ICentreRepository repository, ICandidateRepository candidateRepository, ICourseRepository courseRepository, ILogger<CentreService> logger)
         {
             _logger = logger;
             _candidateRepository = candidateRepository;
+            _courseRepository = courseRepository;
             _centreRepository = repository;
         }
 
@@ -119,27 +123,48 @@ namespace CandidateManagement.Services.Services
             return Result<Centre>.Success(centre);
         }
 
+        public async Task<Result<Centre>> UpdateCentreCourses(Centre centre)
+        {
+            
+            return Result<Centre>.Success(centre);
+        }
+
         public async Task<Result<Centre>> UpdateAsync(Centre centre)
         {
-            var isCentreExist = await CheckIfCentreExistsById(centre.Id);
-            if (isCentreExist == null)
-            {
-                var problemDetails = new ProblemDetails
-                {
-                    Title = "Centre not found",
-                    Detail = $"Centre with ID {centre.Id} not found",
-                    Status = 404
-                };
+            //var isCentreExist = await CheckIfCentreExistsById(centre.Id);
+            //if (isCentreExist == null)
+            //{
+            //    var problemDetails = new ProblemDetails
+            //    {
+            //        Title = "Centre not found",
+            //        Detail = $"Centre with ID {centre.Id} not found",
+            //        Status = 404
+            //    };
 
-                _logger.LogError($"Centre with ID {centre.Id} not found");
-                return Result<Centre>.Failure(problemDetails);
+            //    _logger.LogError($"Centre with ID {centre.Id} not found");
+            //    return Result<Centre>.Failure(problemDetails);
 
-            }
+            //}
             ValidateCentre(centre);
 
             var updatedCentre = await _centreRepository.UpdateAsync(centre);
 
             _logger.LogInformation($"Centre with ID {centre.Id} update");
+            return Result<Centre>.Success(updatedCentre);
+        }
+
+        public async Task<Result<Centre>> UpdateCentreCoures(Centre centre)
+        {
+            var courses = centre.Courses;
+
+            foreach (var course in courses)
+            {
+                await _courseRepository.UpdateCourseCentresAsync(course, centre);
+                
+            }
+
+            var updatedCentre = await _centreRepository.UpdateAsync(centre);
+
             return Result<Centre>.Success(updatedCentre);
         }
 
