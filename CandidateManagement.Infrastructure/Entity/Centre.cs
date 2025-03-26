@@ -16,6 +16,6 @@ namespace CandidateManagement.Infrastructure.Entity
         public required string TelephoneNumber { get; set; }
 
         public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
-        //public virtual ICollection<Course> Courses { get; } = new List<Course>();
+        public ICollection<Course> Courses { get; } = new List<Course>();
     }
 }

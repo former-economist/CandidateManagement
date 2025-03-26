@@ -15,6 +15,12 @@ public class CandidateRepository : BaseRepository<Candidate>, ICandidateReposito
         _context = context;
     }
 
+
+    public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
+    {
+        return await _context.Candidates.Include(c => c.Centre).ToListAsync();
+    }
+
     public async Task<Candidate?> GetByEmailAsync(string email)
     {
         return await _context.Candidates.SingleOrDefaultAsync(c => c.Email == email);

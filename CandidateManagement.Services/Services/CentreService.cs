@@ -49,7 +49,7 @@ namespace CandidateManagement.Services.Services
                 return Result<Centre>.Failure(problemDetails)!;
             }
 
-            var addedCentre = await _centreRepository.AddAsync(centre);
+            var addedCentre = await _centreRepository.AddCentreAsync(centre);
 
             _logger.LogInformation($"Added {addedCentre.Id}");
 

@@ -12,7 +12,7 @@
         public required string TelephoneNumber { get; set; }
 
         public Guid CentreID { get; set; }
-        public virtual Centre Centre { get; set; } = null!;
+        public  Centre Centre { get; set; } = null!;
         //public virtual ICollection<Registration> Registrations { get; } =  new List<Registration>();
     }
 }

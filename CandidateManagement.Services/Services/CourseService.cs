@@ -26,7 +26,7 @@ namespace CandidateManagement.Services.Services
             _logger = logger;
         }
 
-        public async Task<Result<Course>> CreateAsync(Course course)
+        public async Task<Result<Course>> CreateCourseAsync(Course course)
         {
             var isValidCourse = ValidateCourse(course);
 
@@ -36,45 +36,14 @@ namespace CandidateManagement.Services.Services
                 return isValidCourse;
             }
 
-            var centre = course.Centres.FirstOrDefault();
-            if (centre == null)
-            {
-                var problemDetails = new ProblemDetails
-                {
-                    Title = "Insufficient Centre data provided",
-                    Detail = "Course not associated with centre",
-                    Status = 400
-                };
-
-                _logger.LogError("Course not associated with centre");
-
-                return Result<Course>.Failure(problemDetails);
-            }
-
-            var isValidCentre = CheckCentreExists(centre);
-
-            if(isValidCentre == null)
-            {
-                var problemDetails = new ProblemDetails
-                {
-                    Title = "Insufficient Centre data provided",
-                    Detail = "Centre does not exist",
-                    Status = 400
-                };
-
-                _logger.LogError("Centre does not exist");
-
-                return Result<Course>.Failure(problemDetails);
-            }
-
             _repository.AddAsync(course);
 
             return Result<Course>.Success(course);
         }
 
-        public Task<IEnumerable<Course>> GetAllAsync()
+        public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _repository.GetAllAsync();
         }
 
         public Task<Result<Course?>> GetByIdAsync(Guid id)

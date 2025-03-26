@@ -18,9 +18,19 @@ namespace CandidateManagement.Repositories.Repositories
             _context = context;
         }
 
+        public async Task<Centre> AddCentreAsync(Centre centre)
+        {
+            await _context.AddAsync(centre);
+            await _context.SaveChangesAsync();
+            var returnedCentre = await _context.Centres.Where(c => c.Id == centre.Id).Include(c => c.Candidates).FirstOrDefaultAsync();
+
+            return returnedCentre;
+
+        }
+
         public async Task<Centre> GetCentreByIdAsync(Guid id)
         {
-            return await _context.Centres.Where(centre => centre.Id == id).Include(centre => centre.Candidates).FirstOrDefaultAsync();
+            return await _context.Centres.Where(centre => centre.Id == id).Include(centre => centre.Candidates).Include(centre => centre.Courses).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Centre>> GetCentresWithCandidates()

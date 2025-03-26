@@ -11,7 +11,7 @@ namespace CandidateManagement.Infrastructure.Entity
         public Guid Id { get; set; }
         public required string Name { get; set; }
 
-        public virtual ICollection<Centre> Centres { get; } = new List<Centre>();
-        public virtual ICollection<Registration?> Registrations { get; } = new List<Registration>();
+        public virtual ICollection<Centre?> Centres { get; set; } = new List<Centre>();
+        //public virtual ICollection<Registration?> Registrations { get; } = new List<Registration>();
     }
 }

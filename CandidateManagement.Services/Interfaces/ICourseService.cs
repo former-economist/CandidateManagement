@@ -12,7 +12,7 @@ namespace CandidateManagement.Services.Interfaces
     {
         Task<IEnumerable<Course>> GetAllAsync();
         Task<Result<Course?>> GetByIdAsync(Guid id);
-        Task<Result<Course>> CreateAsync(Course course);
+        Task<Result<Course>> CreateCourseAsync(Course course);
         Task<Result<Course>> UpdateAsync(Course course);
         Task<Result<Course>> RemoveAsync(Course course);
     }

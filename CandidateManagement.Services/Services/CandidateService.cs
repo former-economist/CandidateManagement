@@ -30,16 +30,19 @@ public class CandidateService : ICandidateService
     public async Task<IEnumerable<Candidate>> GetAllCandidatesAsync()
     {
         _logger.LogInformation("Accessing all candidates");
-        var candidates =  await _candidateRepository.GetAllAsync();
-        var updatedCandidates = new List<Candidate>();
-        foreach (var candidate in candidates)
-        {
-            var centre = await _centreRepository.GetByIdAsync(candidate.CentreID);
-            candidate.Centre = centre;
-            updatedCandidates.Add(candidate);
-        }
 
-        return updatedCandidates;
+        return await _candidateRepository.GetAllCandidatesAsync();
+
+        //var candidates =  await _candidateRepository.GetAllAsync();
+        //var updatedCandidates = new List<Candidate>();
+        //foreach (var candidate in candidates)
+        //{
+        //    var centre = await _centreRepository.GetByIdAsync(candidate.CentreID);
+        //    candidate.Centre = centre;
+        //    updatedCandidates.Add(candidate);
+        //}
+
+        //return updatedCandidates;
     }
 
     public async Task<Result<Candidate?>> GetCandidateByIdAsync(Guid id)
@@ -88,6 +91,23 @@ public class CandidateService : ICandidateService
             return Result<Candidate>.Failure(problemDetails)!;
         }
 
+        var exisitingCentre = await _centreRepository.GetByIdAsync(candidate.CentreID);
+        if (exisitingCentre == null)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Centre does not exist",
+                Detail = $"Centre with ID {candidate.CentreID} does not exist",
+                Status = 400
+            };
+
+            _logger.LogError($"Centre with ID {candidate.CentreID} does not exist");
+
+            return Result<Candidate>.Failure(problemDetails)!;
+        }
+
+        candidate.Centre = exisitingCentre;
+
         var addedCandidate = await _candidateRepository.AddAsync(candidate);
 
         _logger.LogInformation($"Added {addedCandidate.Id}");
@@ -97,20 +117,20 @@ public class CandidateService : ICandidateService
 
     public async Task<Result<Candidate>> UpdateCandidateAsync(Candidate candidate)
     {
-        var isCandidateExist = await CheckIfCandidateExistsById(candidate.Id);
-        if (isCandidateExist == null)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Title = "Candidate not found",
-                Detail = $"Candidate with ID {candidate.Id} not found",
-                Status = 404
-            };
+        //var isCandidateExist = await CheckIfCandidateExistsById(candidate.Id);
+        //if (isCandidateExist == null)
+        //{
+        //    var problemDetails = new ProblemDetails
+        //    {
+        //        Title = "Candidate not found",
+        //        Detail = $"Candidate with ID {candidate.Id} not found",
+        //        Status = 404
+        //    };
 
-            _logger.LogError($"Candidate with ID {candidate.Id} not found");
-            return Result<Candidate>.Failure(problemDetails);
+        //    _logger.LogError($"Candidate with ID {candidate.Id} not found");
+        //    return Result<Candidate>.Failure(problemDetails);
 
-        }
+        //}
         ValidateCandidate(candidate);
 
         var updatedCandidate = await _candidateRepository.UpdateAsync(candidate);
@@ -150,6 +170,7 @@ public class CandidateService : ICandidateService
             return Result<Candidate>.Failure(problemDetails);
 
         }
+
 
         _logger.LogInformation($"Candidate with ID {candidate.Id} removed");
         return Result<Candidate>.Success(candidate);

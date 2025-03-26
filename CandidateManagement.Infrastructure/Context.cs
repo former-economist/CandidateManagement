@@ -7,7 +7,7 @@ namespace CandidateManagement.Infrastructure
     {
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Centre> Centres { get; set; }
-        //public DbSet<Course> Courses { get; set; }
+        public DbSet<Course> Courses { get; set; }
         //public DbSet<Registration> Registrations { get; set; }
 
         private readonly DbContextOptions<Context> _dbContextOptions;
@@ -32,11 +32,15 @@ namespace CandidateManagement.Infrastructure
                 TelephoneNumber = "0161-9876-5432"
             };
 
-            var candidate = new Candidate { Forename = "John", Surname = "Smith", Email = "john.smith@example.com", DateOfBirth = new DateTime(1990, 3, 15), SwqrNumber = "10012345", TelephoneNumber = "0987654321", Id = Guid.NewGuid(), CentreID = centre.Id };
-
             modelBuilder.Entity<Centre>().HasData(centre);
 
+            var candidate = new Candidate { Forename = "John", Surname = "Smith", Email = "john.smith@example.com", DateOfBirth = new DateTime(1990, 3, 15), SwqrNumber = "10012345", TelephoneNumber = "0987654321", Id = Guid.NewGuid(), CentreID = centre.Id };
+
             modelBuilder.Entity<Candidate>().HasData(candidate);
+
+            var course = new Course { Id = Guid.NewGuid(), Name = "Computer Science"};
+
+            modelBuilder.Entity<Course>().HasData(course);
 
             
         }

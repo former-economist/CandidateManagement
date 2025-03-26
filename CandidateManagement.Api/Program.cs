@@ -22,12 +22,14 @@ builder.Logging.AddLog4Net();
 // Register services 
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 builder.Services.AddScoped<ICentreService, CentreService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 // Register Db
 builder.Services.AddDbContext<Context>(options =>
 {
     options
     .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging();
 });
 
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -40,6 +42,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
 builder.Services.AddScoped<ICentreRepository, CentreRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 var app = builder.Build();
 
@@ -54,6 +57,8 @@ app.UseStatusCodePages();
 //app.UseExceptionHandler();
 
 // Map endpoints 
+
+app.MapGet("/course", async(ICourseService service) => await service.GetAllAsync());
 
 app.MapGet("/centres", async(ICentreService service) => await service.GetAllAsync());
 

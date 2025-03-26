@@ -17,11 +17,12 @@ namespace CandidateManagement.Tests
         {   
             var candidates = SampleCandidates();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetAllAsync().Result)
                 .Returns(candidates);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
 
             var results = await service.GetAllCandidatesAsync();
             var resultList = results.ToList();
@@ -43,12 +44,13 @@ namespace CandidateManagement.Tests
             //Arrange
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var result = await service.GetCandidateByIdAsync(candidate.Id);
 
 
@@ -61,13 +63,14 @@ namespace CandidateManagement.Tests
         {
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync<ICandidateRepository, Candidate>(null as Candidate);
 
 
             //Action
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var guid = Guid.NewGuid();
             var outcome = service.GetCandidateByIdAsync(guid);
             //Assert
@@ -87,12 +90,13 @@ namespace CandidateManagement.Tests
             //Arrange
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = await service.CreateCandidateAsync(candidate);
 
             Assert.NotNull(outcome);
@@ -106,12 +110,13 @@ namespace CandidateManagement.Tests
         {
             //Arrange
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
             //Action
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(null as Candidate);
 
             Assert.Equal(outcome.Result.IsSuccess, false);
@@ -127,11 +132,12 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             candidate.Email = string.Empty;
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
 
             Assert.Equal(outcome.Result.IsSuccess, false);
@@ -147,11 +153,12 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             candidate.Email = "exampletest";
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
 
             var outcome = service.CreateCandidateAsync(candidate);
 
@@ -168,11 +175,12 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             candidate.DateOfBirth = DateTime.UtcNow;
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.AddAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(null as Candidate);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
 
             Assert.Equal(outcome.Result.IsSuccess, false);
@@ -188,11 +196,12 @@ namespace CandidateManagement.Tests
             var candidate = SampleCandidate();
             var existingCandidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync(existingCandidate);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = service.CreateCandidateAsync(candidate);
 
             Assert.Null(outcome.Result.Value);
@@ -220,13 +229,14 @@ namespace CandidateManagement.Tests
             };
 
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(candidateToBeUpdated);
             mockRepository.Setup(x => x.UpdateAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(updatedCandidate);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = await service.UpdateCandidateAsync(candidateToBeUpdated);
 
 
@@ -245,11 +255,12 @@ namespace CandidateManagement.Tests
             var candidateToBeDeleted = SampleCandidate();
 
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(candidateToBeDeleted.Id);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             
             var actualOutput = await service.RemoveCandidateAsync(candidateToBeDeleted);
 
@@ -262,11 +273,12 @@ namespace CandidateManagement.Tests
         {
             var candidate = SampleCandidate();
             var mockRepository = new Mock<ICandidateRepository>();
+            var mockCentreRepository = new Mock<ICentreRepository>();
             var mockLogger = new Mock<ILogger<CandidateService>>();
             mockRepository.Setup(x => x.DeleteAsync(It.IsAny<Candidate>()))
                 .ReturnsAsync(Guid.Empty);
 
-            var service = new CandidateService(mockRepository.Object, mockLogger.Object);
+            var service = new CandidateService(mockRepository.Object, mockCentreRepository.Object, mockLogger.Object);
             var outcome = service.RemoveCandidateAsync(candidate);
 
             Assert.Null(outcome.Result.Value);

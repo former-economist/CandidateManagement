@@ -12,6 +12,7 @@ namespace CandidateManagement.Repositories.Interfaces
         Task<IEnumerable<Centre>> GetCentresWithCandidates();
         Task<Centre> GetByEmailAsync(string email);
         Task<Centre> GetCentreByIdAsync(Guid id);
+        Task<Centre> AddCentreAsync(Centre centre);
     }
 
 }
